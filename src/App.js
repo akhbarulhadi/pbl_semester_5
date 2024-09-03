@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Product from './components/Product';
-import About from './components/About';
-import FormProduct from './components/formProduct';
+import Product from './pages/Product';
+import About from './pages/About';
+import FormProduct from './pages/formProduct';
 
 function App() {
   return (
