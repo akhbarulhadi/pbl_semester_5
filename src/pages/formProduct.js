@@ -18,7 +18,8 @@ function AddProduct() {
         });
     }
   }, [id_product]);
-
+  console.log(id_product);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
