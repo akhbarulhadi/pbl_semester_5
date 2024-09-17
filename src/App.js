@@ -1,22 +1,22 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Drawer from './components/Drawer';
 import Footer from './components/FooterComponent';
-import Product from './pages/Product';
-import About from './pages/About';
-import FormProduct from './pages/formProduct';
-import ModulPelatihan from './pages/ModulPelatihan';
-import ForumDiskusi from './pages/ForumDiskusi';
-import Sertifikat from './pages/sertifikat';
+import Product from './LandingPage/Product';
+import About from './LandingPage/About';
+import FormProduct from './LandingPage/formProduct';
+import ModulPelatihan from './LandingPage/ModulPelatihan';
+import ForumDiskusi from './LandingPage/ForumDiskusi';
+import Sertifikat from './LandingPage/sertifikat';
+import Login from './LandingPage/Login';
 import './index.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const MainContent = () => {
   const location = useLocation();
-  const showDrawer = !['/forum-diskusi', '/modul-pelatihan', '/sertifikat'].includes(location.pathname);
+  const showDrawer = !['/forum-diskusi', '/modul-pelatihan', '/sertifikat', '/login'].includes(location.pathname);
 
   return (
     <>
@@ -30,8 +30,24 @@ const MainContent = () => {
           <Route path="/modul-pelatihan" element={<ModulPelatihan />} />
           <Route path="/forum-diskusi" element={<ForumDiskusi />} />
           <Route path="/sertifikat" element={<Sertifikat />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </main>
+    </>
+  );
+};
+
+const Layout = () => {
+  const location = useLocation();
+  
+  // Tentukan halaman-halaman tertentu yang tidak membutuhkan Navbar atau Footer
+  const hideNavbarAndFooter = ['/login', '/signup'].includes(location.pathname);
+
+  return (
+    <>
+      {!hideNavbarAndFooter && <Navbar />}
+      <MainContent />
+      {!hideNavbarAndFooter && <Footer />}
     </>
   );
 };
@@ -39,9 +55,7 @@ const MainContent = () => {
 const App = () => {
   return (
     <Router>
-      <Navbar />
-      <MainContent />
-      <Footer />
+      <Layout />
     </Router>
   );
 };
