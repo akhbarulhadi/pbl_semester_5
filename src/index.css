@@ -8,6 +8,61 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 }
+
+@media (min-width: 768px) {
+  .responsive-image {
+    width: 75%; /* Misalnya, atur sesuai kebutuhan */
+  }
+}
+
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Animasi marquee berlawanan arah */
+@keyframes marquee-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Kontainer marquee */
+.marquee-container {
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+  height: 3rem; /* Sesuaikan dengan tinggi elemen */
+}
+
+/* Baris pertama */
+.marquee-row-1 {
+  display: flex;
+  animation: marquee-left 10s linear infinite;
+}
+
+/* Baris kedua */
+.marquee-row-2 {
+  display: flex;
+  animation: marquee-right 10s linear infinite;
+}
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
