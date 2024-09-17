@@ -18,7 +18,8 @@ function AddProduct() {
         });
     }
   }, [id_product]);
-
+  console.log(id_product);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -57,7 +58,7 @@ function AddProduct() {
       console.log('Product saved:', data);
 
       // Redirect ke halaman sebelumnya setelah menyimpan data
-      navigate('/');
+      navigate('/product');
     } catch (error) {
       console.error('Error:', error);
     }

@@ -1,0 +1,216 @@
+const express = require('express');
+const router = express.Router();
+const snap = require('../midtrans'); // Midtrans configuration
+const { createClient } = require("@supabase/supabase-js");
+const authMiddleware = require('../middleware/authMiddleware'); // Import middleware autentikasi
+require('dotenv').config();
+
+// ! Buat client Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Endpoint untuk memulai pembayaran
+router.post("/pay-course", authMiddleware, async (req, res) => {
+    const { id_course } = req.body;
+    const id_user = req.user.id; // Ambil id_user dari token
+
+    console.log('Request Body:', req.body);
+
+    try {
+        // Ambil detail kursus
+        const { data: course, error: courseError } = await supabase
+            .from("courses")
+            .select("*")
+            .eq("id_course", id_course)
+            .single();
+
+        if (courseError || !course) throw new Error("Kursus tidak ditemukan");
+
+        // Ambil detail pengguna dari tabel public.users
+        const { data: publicUser, error: publicUserError } = await supabase
+            .from("users")
+            .select("name")
+            .eq("id_user", id_user)
+            .single();
+
+        if (publicUserError || !publicUser) throw new Error("Pengguna tidak ditemukan di public.users");
+
+        // Ambil detail pengguna auth users
+        const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(id_user);
+
+        console.log('User Data:', user);
+        console.log('User Error:', userError);
+        if (userError || !user) throw new Error("Pengguna tidak ditemukan auth users");
+
+        // Buat data transaksi untuk Midtrans
+        const transaction = {
+            transaction_details: {
+                order_id: `course-${id_course}-${Date.now()}`,
+                gross_amount: course.price,
+            },
+            customer_details: {
+                first_name: publicUser.name,
+                email: user.email,
+            },
+            item_details: [
+                {
+                    id: course.id_course.toString(),
+                    price: course.price,
+                    quantity: 1,
+                    name: course.course_title,
+                },
+            ],
+        };
+
+        // Buat transaksi di Midtrans
+        const midtransResponse = await snap.createTransaction(transaction);
+
+        console.log('Midtrans Response:', midtransResponse);
+
+        if (!midtransResponse || !midtransResponse.redirect_url) {
+            throw new Error('Midtrans response tidak valid atau redirect_url tidak ditemukan');
+        }
+
+        // Simpan transaksi di tabel `user_payment_courses` dengan status `pending`
+        const { data: paymentData, error: paymentError } = await supabase
+            .from("user_payment_courses")
+            .insert([
+                {
+                    id_user: id_user,
+                    id_course: id_course,
+                    payment_status: 'pending',
+                    transaction_id: transaction.transaction_details.order_id,
+                    snap_token: midtransResponse.token,
+                    snap_redirect_url: midtransResponse.redirect_url
+                },
+            ]);
+
+        if (paymentError) throw paymentError;
+
+        res.status(201).json({
+            message: "Transaksi berhasil dibuat",
+            redirect_url: midtransResponse.redirect_url,
+            snap_token: midtransResponse.token,
+        });
+    } catch (error) {
+        console.error('Error dalam proses pembayaran:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ! ini notifikasi midtrans sekarang
+router.post("/midtrans-notification", async (req, res) => {
+  const { order_id, transaction_status, payment_type } = req.body;
+
+  try {
+      // Update status pembayaran berdasarkan notifikasi Midtrans
+      let payment_status = 'pending';
+      if (transaction_status === 'settlement' || transaction_status === 'capture') {
+          payment_status = 'paid';
+      } else if (transaction_status === 'cancel' || transaction_status === 'expire') {
+          payment_status = 'failed';
+      }
+
+      // Update status pembayaran di database
+      const { data: paymentData, error: paymentError } = await supabase
+          .from("user_payment_courses")
+          .update({ payment_status, payment_method: payment_type, payment_date: new Date() })
+          .eq("transaction_id", order_id);
+
+      if (paymentError) throw paymentError;
+
+      // Jika pembayaran berhasil, tambahkan data ke tabel join_courses
+      if (payment_status === 'paid') {
+          // Ambil detail kursus dan pengguna berdasarkan order_id
+          const { data: paymentRecord, error: paymentRecordError } = await supabase
+              .from("user_payment_courses")
+              .select("id_user, id_course")
+              .eq("transaction_id", order_id)
+              .single();
+
+          if (paymentRecordError || !paymentRecord) throw new Error("Detail transaksi tidak ditemukan");
+
+          const { id_user, id_course } = paymentRecord;
+
+          const { data: joinData, error: joinError } = await supabase
+              .from("join_courses")
+              .insert([{
+                  id_user: id_user,
+                  id_course: id_course,
+              }]);
+
+          if (joinError) throw joinError;
+      }
+
+      res.status(200).json({ 
+          message: "Notifikasi diterima", 
+          data: paymentData,
+          status: payment_status,
+      });
+  } catch (error) {
+      console.error('Error dalam Midtrans Notification:', error.message);
+      res.status(500).json({ error: error.message });
+  }
+});
+
+// ! ini unutk testing notifikasi midtrans sebelumnya
+// router.post("/midtrans-notification", async (req, res) => {
+//   const { order_id, transaction_status, payment_type } = req.body;
+
+//   try {
+//     // Log metode pembayaran yang diterima dari notifikasi Midtrans
+//     // console.log('Midtrans Notification - Payment Method:', payment_type);
+//     // console.log('Midtrans Notification - Full Body:', req.body); // Log seluruh isi notifikasi Midtrans
+    
+//     // Update status pembayaran berdasarkan notifikasi Midtrans
+//     let payment_status = 'pending';
+//     if (transaction_status === 'settlement' || transaction_status === 'capture') {
+//       payment_status = 'paid';
+//     } else if (transaction_status === 'cancel' || transaction_status === 'expire') {
+//       payment_status = 'failed';
+//     }
+
+//     // Update status pembayaran di database
+//     const { data, error } = await supabase
+//       .from("user_payment_courses")
+//       .update({ payment_status, payment_method: payment_type, payment_date: new Date() })
+//       .eq("transaction_id", order_id);
+
+//     if (error) throw error;
+
+//     res.status(200).json({ 
+//       message: "Notifikasi diterima", 
+//       data,
+//       status: payment_status,
+//       // redirect_url: "http://localhost:3000/courses" 
+//     });
+//   } catch (error) {
+//     console.error('Error dalam Midtrans Notification:', error.message);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+
+router.post("/join-course", authMiddleware, async (req, res) => {
+    const { id_course } = req.body;
+    const id_user = req.user.id; // Ambil id_user dari token
+
+    try {
+        const { data, error } = await supabase
+            .from("join_courses")
+            .insert([
+                {
+                    id_user: id_user,
+                    id_course: id_course,
+                },
+            ]);
+
+        if (error) throw error;
+        res.status(201).json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+module.exports = router;
