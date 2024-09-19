@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-const Login = () => {
+const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch("/api/auth", {
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,15 +28,15 @@ const Login = () => {
       // Redirect ke halaman lain, misalnya ke halaman dashboard
       navigate("/courses");
     } catch (error) {
-      setError("Terjadi kesalahan. Silakan coba lagi.");
+      setError("An error occurred. Please try again.");
       console.error(error);
     }
   };
 
   return (
     <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
+      <h2>Sign Up</h2>
+      <form onSubmit={handleSignUp}>
         <div>
           <label>Email:</label>
           <input
@@ -56,15 +56,24 @@ const Login = () => {
           />
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <Link
-          to="/pengajar/dashboard-pengajar"
+        <button
+          type="submit"
           className="shadow-submit dark:shadow-submit-dark rounded-lg items-center justify-center bg-black py-4 text-base font-medium text-white duration-300 hover:bg-gray-600"
         >
-          Masuk
-        </Link>
+          Sign Up
+        </button>
       </form>
+      <p>
+        Already have an account?{" "}
+        <Link
+          to="/login"
+          className="text-blue-500 hover:underline"
+        >
+          Log In
+        </Link>
+      </p>
     </div>
   );
 };
 
-export default Login;
+export default SignUp;
