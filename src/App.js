@@ -20,12 +20,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import SignUp from "LandingPage/SignUp";
 import PengajarRoutes from "Pengajar/PengajarRoutes";
+import AdminRoutes from "Admin/AdminRoutes";
 
 const MainContent = () => {
   const location = useLocation();
   // Halaman yang tidak menampilkan Drawer
   const hideDrawer =["/forum-diskusi","/modul-pelatihan","/sertifikat","/login","/signup",
-    ].includes(location.pathname) || location.pathname.startsWith("/pengajar");
+    ].includes(location.pathname) || location.pathname.startsWith("/pengajar") || location.pathname.startsWith("/admin");
 
   return (
     <>
@@ -42,6 +43,7 @@ const MainContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/pengajar/*" element={<PengajarRoutes />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
         </Routes>
       </main>
     </>
@@ -54,7 +56,8 @@ const Layout = () => {
   // Tentukan halaman-halaman tertentu yang tidak membutuhkan Navbar atau Footer
   const hideNavbarAndFooter =
     ["/login", "/signup"].includes(location.pathname) ||
-    location.pathname.startsWith("/pengajar");
+    location.pathname.startsWith("/pengajar") ||
+    location.pathname.startsWith("/admin");
   return (
     <>
       {!hideNavbarAndFooter && <Navbar />}
