@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 
 const PengajarLayout = ({ children }) => {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-white">
       <HeaderPengajar />
       <div className="flex">
         <SidebarPengajar />

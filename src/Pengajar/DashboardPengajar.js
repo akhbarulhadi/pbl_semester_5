@@ -5,12 +5,12 @@ import DataIncome from "./DataIncome";
 
 const DashboardPengajar = () => {
   return (
-    <div className="p-4 sm:ml-64">
+    <div className="p-4 sm:ml-64 bg-white">
       <div className="p-4   dark:border-gray-700 mt-14">
         <div className="grid grid-cols-3 gap-4 mb-4">
           {/* <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"> */}
           <Link to="/pengajar/form-income" classNameName="block">
-        <DataIncome title="Total Income" total="1.800" rate="-0.23%" levelDown>
+        <DataIncome title="Total Income" total="Rp.180000" rate="-0.23%" levelDown>
         <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -30,7 +30,7 @@ const DashboardPengajar = () => {
           </svg>
         </DataIncome>
       </Link>
-            <DataIncome title="Total Siswa" total="$3.456K" rate="0.43%" levelUp>
+            <DataIncome title="Total Siswa" total="243" rate="0.43%" levelUp>
             <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -49,7 +49,7 @@ const DashboardPengajar = () => {
             />
           </svg>
           </DataIncome>
-          <DataIncome title="Total Kelas" total="$45,2K" rate="0.43%" levelUp>
+          <DataIncome title="Total Kelas" total="45" rate="0.43%" levelUp>
 
           <svg
             className="fill-primary dark:fill-white"
