@@ -43,6 +43,9 @@ const Navbar = () => {
             </a>
             <ul className="hidden lg:flex items-center space-x-4">
               <li>
+                <Link to="/" className="text-black font-poppins text-xl px-4 py-2 rounded-2xl">Home</Link>
+              </li>
+              <li>
                 <Link to="/modul-pelatihan" className="text-black font-poppins text-xl px-4 py-2 rounded-2xl">Modul pelatihan</Link>
               </li>
               <li>
@@ -56,15 +59,6 @@ const Navbar = () => {
               </li>
             </ul>
           </div>
-          {!isMobileMenuOpen && (
-            <div className="relative hidden lg:block">
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="text-black px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          )}
           <div className="flex items-center space-x-4">
             <Link to="/login" className="text-white bg-[#007BFF] hover:bg-black px-4 py-2 rounded-2xl text-lg">Log In</Link>
             <Link to="/signup" className="text-white bg-[#007BFF] hover:bg-black px-4 py-2 rounded-2xl text-lg">Sign Up</Link>
@@ -83,7 +77,7 @@ const Navbar = () => {
         </div>
       </div>
       {/* Mobile Menu */}
-      <div className={`lg:hidden fixed inset-0 z-40 bg-gray-900 bg-opacity-50 ${isMobileMenuOpen ? 'block' : 'hidden'}`} onClick={toggleMobileMenu}>
+      <div className={`lg:hidden fixed inset-0 z-40 bg-gray-900 bg-opacity-50 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 mobile-menu`}>
         <div className="relative bg-white dark:bg-gray-800 h-full w-64 p-4">
           <button onClick={toggleMobileMenu} className="absolute top-4 right-4 p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md">
             <span className="sr-only">Close menu</span>
@@ -92,11 +86,51 @@ const Navbar = () => {
             </svg>
           </button>
           <ul className="space-y-4">
-            <li><Link to="/modul-pelatihan" className="block text-black text-center bg-[#00FFFF] hover:bg-white px-4 py-2 rounded-2xl">Modul pelatihan</Link></li>
-            <li><Link to="/about" className="block text-black text-center bg-[#FF00FF] hover:bg-white px-4 py-2 rounded-2xl">Forum diskusi</Link></li>
-            <li><Link to="/services" className="block text-black text-center bg-[#FFC83E] hover:bg-white px-4 py-2 rounded-2xl">Pelaporan & Statistik</Link></li>
-            <li><Link to="/option1" className="block text-black text-center bg-[#9E9C9C] hover:bg-white px-4 py-2 rounded-2xl">Sertifikasi</Link></li>
-            <li><Link to="/option2" className="block text-black text-center bg-blue-500 hover:bg-white px-4 py-2 rounded-2xl">Manajemen admin</Link></li>
+            <li>
+              <Link 
+                to="/modul-pelatihan" 
+                className="block text-black text-center bg-[#00FFFF] hover:bg-white px-4 py-2 rounded-2xl"
+                onClick={toggleMobileMenu} // Menutup menu setelah klik
+              >
+                Modul pelatihan
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/forum-diskusi" 
+                className="block text-black text-center bg-[#FF00FF] hover:bg-white px-4 py-2 rounded-2xl"
+                onClick={toggleMobileMenu} // Menutup menu setelah klik
+              >
+                Forum diskusi
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/services" 
+                className="block text-black text-center bg-[#FFC83E] hover:bg-white px-4 py-2 rounded-2xl"
+                onClick={toggleMobileMenu} // Menutup menu setelah klik
+              >
+                Pelaporan & Statistik
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/sertifikat" 
+                className="block text-black text-center bg-[#9E9C9C] hover:bg-white px-4 py-2 rounded-2xl"
+                onClick={toggleMobileMenu} // Menutup menu setelah klik
+              >
+                Sertifikasi
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/manajemen-admin" 
+                className="block text-black text-center bg-blue-500 hover:bg-white px-4 py-2 rounded-2xl"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Manajemen admin
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

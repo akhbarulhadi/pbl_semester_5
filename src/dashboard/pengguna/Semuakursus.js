@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Card from '../components/Card';
+import Card from '../../components/Card';
 
-const ModulPelatihan = () => {
+const SemuaKursus = () => {
   const [activeFilter, setActiveFilter] = useState({
     category: null,
     sort: null,
@@ -65,7 +65,7 @@ const ModulPelatihan = () => {
   );
 
   return (
-    <section className="relative mt-20 bg-[#f0f9ff] w-full">
+    <section className="relative mt-20 md:ml-72 bg-[#f0f9ff] w-full">
       <div className="w-full px-4 py-16 md:px-8 md:py-20">
         {/* Teks di atas */}
         <div className="mb-12">
@@ -119,7 +119,7 @@ const ModulPelatihan = () => {
 
           {/* Kartu */}
           <main className="flex-1">
-            <div className="mx-auto grid w-full gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto grid w-full gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {filteredCardData.map((card, index) => (
                 <Card
                   key={index}
@@ -140,4 +140,4 @@ const ModulPelatihan = () => {
   );
 };
 
-export default ModulPelatihan;
+export default SemuaKursus;

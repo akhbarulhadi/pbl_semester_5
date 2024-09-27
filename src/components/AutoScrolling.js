@@ -1,5 +1,4 @@
 import React from 'react';
-import './styles/marquee.css'; // Mengarah ke folder styles dari folder components
 
 const AutoScrolling = () => {
   return (
