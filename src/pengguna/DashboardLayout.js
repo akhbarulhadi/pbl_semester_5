@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import NavbarSidebar from '../dashboard/pengguna/Usidebar'; // Sesuaikan dengan path yang benar
+import NavbarSidebar from '../pengguna/Usidebar'; // Sesuaikan dengan path yang benar
 
 const DashboardLayout = () => {
   return (

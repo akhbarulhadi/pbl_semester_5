@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/navbar'; // Sesuaikan path dengan lokasi Navbar
 import Footer from './components/FooterComponent';
 import Product from './LandingPage/Product';
@@ -10,28 +10,12 @@ import Login from './LandingPage/Login';
 import SignUp from './LandingPage/SignUp'; // Path yang benar
 import PengajarRoutes from './Pengajar/PengajarRoutes'; // Path yang benar
 import AdminRoutes from './Admin/AdminRoutes'; // Path yang benar
-import NavbarSidebar from './dashboard/pengguna/Usidebar'; // Path yang benar
+import PenggunaRoutes from './pengguna/PenggunaRoutes'; // Path yang benar
 import Drawer from './LandingPage/Home';
-import KursusSaya from './dashboard/pengguna/KursusSaya'; // Import komponen KursusSaya
-import Transaksi from './dashboard/pengguna/Transaksi'; // Import komponen Transaksi
-import SertifikatU from './dashboard/pengguna/SertifikatU'; // Import komponen SertifikatU
-import PengaturanU from './dashboard/pengguna/PengaturanU'; // Import komponen PengaturanU
-import SemuaKursus from './dashboard/pengguna/Semuakursus'; // Import komponen SemuaKursus
+
 import './index.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-
-// Komponen Parent untuk Dashboard dengan Outlet untuk child routes
-const DashboardLayout = () => {
-  return (
-    <div className="flex">
-      <NavbarSidebar /> {/* Tambahkan NavbarSidebar di sini */}
-      <div className="flex-1 p-4">
-        <Outlet /> {/* Ini akan me-render child routes */}
-      </div>
-    </div>
-  );
-};
 
 // MainContent untuk routing berdasarkan role
 const MainContent = () => {
@@ -44,7 +28,11 @@ const MainContent = () => {
     "/sertifikat",
     "/login",
     "/signup",
-  ].includes(location.pathname) || location.pathname.startsWith("/pengajar") || location.pathname.startsWith("/admin")||location.pathname.startsWith("/dashboard");
+  ].includes(location.pathname) ||
+    location.pathname.startsWith("/pengajar") ||
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/dashboard") ||
+    location.pathname.startsWith("/pengguna");
 
   return (
     <>
@@ -53,20 +41,6 @@ const MainContent = () => {
         <Routes>
           <Route path="/" element={<Product />} />
           <Route path="/product" element={<Product />} />
-
-          {/* Parent route untuk dashboard */}
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            {/* Rute untuk halaman "Kursus Saya" */}
-            <Route path="pengguna/kursus" element={<KursusSaya />} />
-            <Route path="pengguna/transaksi" element={<Transaksi />} />
-            <Route path="pengguna/sertifikatU" element={<SertifikatU />} />
-            <Route path="pengguna/pengaturanU" element={<PengaturanU />} />
-            {/* Halaman SemuaKursus dipindahkan ke luar dashboard */}
-          </Route>
-
-          {/* Rute khusus untuk SemuaKursus di luar dashboard */}
-          <Route path="/semuakursus" element={<SemuaKursus />} />
-
           <Route path="/modul-pelatihan" element={<ModulPelatihan />} />
           <Route path="/forum-diskusi" element={<ForumDiskusi />} />
           <Route path="/sertifikat" element={<Sertifikat />} />
@@ -74,6 +48,7 @@ const MainContent = () => {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/pengajar/*" element={<PengajarRoutes />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route path="/pengguna/*" element={<PenggunaRoutes />} />
         </Routes>
       </main>
     </>
@@ -89,7 +64,8 @@ const Layout = () => {
     ["/login", "/signup"].includes(location.pathname) ||
     location.pathname.startsWith("/pengajar") ||
     location.pathname.startsWith("/admin") ||
-    location.pathname.startsWith('/dashboard');
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/pengguna');
 
   return (
     <>

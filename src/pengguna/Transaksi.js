@@ -24,6 +24,7 @@ const Transaksi = () => {
   ];
 
   return (
+    <section className="relative mt-20 bg-gradient-to-r from-blue-100 to-white w-full">
     <div className="p-4 md:ml-72 mt-24 min-h-screen mx-auto">
       <div className="mb-4">
         <h2 className="text-xl font-bold">Riwayat Transaksi</h2>
@@ -55,6 +56,7 @@ const Transaksi = () => {
         </table>
       </div>
     </div>
+    </section>
   );
 };
 

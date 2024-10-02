@@ -20,6 +20,7 @@ const SertifikatU = () => {
   ];
 
   return (
+    <section className="relative mt-20 bg-gradient-to-r from-blue-100 to-white w-full">
     <div className="container md:ml-72 mt-24 min-h-screen mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Halaman Sertifikat</h1>
       <Link to="/dashboard/pengguna/kursus" className="text-blue-500 mb-4 inline-block">
@@ -35,6 +36,7 @@ const SertifikatU = () => {
         ))}
       </div>
     </div>
+    </section>
   );
 };
 
