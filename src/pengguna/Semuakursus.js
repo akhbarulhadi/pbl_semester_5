@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Card from '../components/Card';
-import Usidebar from './Usidebar'; // Impor Usidebar
+import Navbar from './NavbarU'; // Pastikan import navbar sesuai dengan nama file yang benar
+
 
 const SemuaKursus = () => {
   const [activeFilter, setActiveFilter] = useState({
@@ -64,13 +65,9 @@ const SemuaKursus = () => {
 
   return (
     <div className="flex">
-      {/* Sidebar */}
-      <Usidebar />
-      
       {/* Konten Utama */}
-      <main className="flex-1 md:ml-64">
-        <section className="relative mt-20 bg-gradient-to-r from-blue-100 to-white w-full">
-          <div className="w-full px-4 py-16 md:px-8 md:py-20">
+      <section className="relative mt-20 bg-gradient-to-r from-purple-100 to-blue-200 w-full min-h-screen">
+      <div className="w-full px-4 py-16 md:px-8 md:py-20">
             <div className="mb-12">
               <p className="text-2xl font-bold font-poppins text-[#6ee7b7]">#Belajar dari ahlinya</p>
               <h1 className="text-5xl font-bold font-poppins text-[#030712] mb-4">Modul Pelatihan</h1>
@@ -101,7 +98,6 @@ const SemuaKursus = () => {
             </div>
           </div>
         </section>
-      </main>
     </div>
   );
 };

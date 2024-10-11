@@ -1,35 +1,43 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import KursusSaya from './KursusSaya'; // Import komponen KursusSaya
-import Transaksi from './Transaksi'; // Import komponen Transaksi
-import SertifikatU from './SertifikatU'; // Import komponen SertifikatU
-import PengaturanU from './PengaturanU'; // Import komponen PengaturanU
-import SemuaKursus from './Semuakursus'; // Import komponen SemuaKursus
+import KursusSaya from './KursusSaya';
+import DetailKursus from './DetailKursus';
+import Transaksi from './Transaksi';
+import SertifikatU from './SertifikatU';
+import PengaturanU from './PengaturanU';
+import SemuaKursus from './Semuakursus';
 import ProfileU from './ProfileU';
-import DetailKursus from './DetailKursus'; // Import komponen DetailKursus
-import DashboardLayout from './DashboardLayout'; // Import layout DashboardLayout
-import Usidebar from './Usidebar'; // Import Sidebar jika perlu
+import DashboardU from './DashboardU';
+import DashboardLayout from './DashboardLayout';
+import Usidebar from './Usidebar';
+import LihatKelasDetail from './LihatDetailKelas';
+import MulaiKelas from './MulaiKelas';
+import DetailTransaksi from './DetailTransaksi';
+import NavbarLayout from './navbarLayout'; // Pastikan NavbarLayout diimpor
 
 const PenggunaRoutes = () => {
   return (
     <Routes>
+      {/* Rute dengan sidebar */}
       <Route path="/" element={<DashboardLayout />}>
-        {/* Rute untuk halaman "Kursus Saya" */}
         <Route path="kursus" element={<KursusSaya />} />
-        {/* Rute untuk halaman Transaksi */}
         <Route path="transaksi" element={<Transaksi />} />
-        {/* Rute untuk halaman Sertifikat */}
         <Route path="sertifikat" element={<SertifikatU />} />
-        {/* Rute untuk halaman Pengaturan */}
         <Route path="pengaturan" element={<PengaturanU />} />
-        {/* Rute untuk halaman Semua Kursus */}
-        <Route path="semua-kursus" element={<SemuaKursus />} />
-        {/* Rute untuk halaman Detail Kursus berdasarkan ID */}
-        <Route path="kursus/:id" element={<DetailKursus />} />
-        {/* Rute untuk halaman Usidebar */}
-        <Route path="Usidebar" element={<Usidebar />} />
-        {/* Rute untuk halaman ProifleU */}
+        <Route path="dashboardU" element={<DashboardU />} />
         <Route path="profile" element={<ProfileU />} />
+        <Route path="Usidebar" element={<Usidebar />} />
+
+      </Route>
+
+      {/* Rute tanpa sidebar dengan navbar khusus */}
+      <Route element={<NavbarLayout />}>
+        <Route path="lihatkelas/:id" element={<LihatKelasDetail />} />
+        <Route path="mulaikelas/:id" element={<MulaiKelas />} />
+        <Route path="transaksi/:id" element={<DetailTransaksi />} />
+        <Route path="kursus/:id" element={<DetailKursus />} />
+        <Route path="semua-kursus" element={<SemuaKursus />} />
+
       </Route>
     </Routes>
   );
