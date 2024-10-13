@@ -3,8 +3,13 @@ import PengajarLayout from "./PengajarLayout";
 import DashboardPengajar from "./DashboardPengajar";
 import FormIncome from "./FormIncome";
 import FormKelas from "./FormKelas";
+import Kelas from "./Kelas";
+import ProfilPengajar from "./ProflePengajar";
+import DetailKelas from "./DetailKelas";
+import RiwayatTransaksi from "./RiwayatTransaksi";
+import ProfilePengajar from "./ProflePengajar";
 
-const PengajarRoutes = () => {
+const PengajarRoutes = () =>   {
   return (
     <Routes>
       {/* Semua halaman pengajar akan dibungkus oleh PengajarLayout */}
@@ -12,7 +17,13 @@ const PengajarRoutes = () => {
         <Route path="dashboard-pengajar" element={<DashboardPengajar />} />
         <Route path="form-kelas" element={<FormKelas />} />
         <Route path="form-income" element={< FormIncome />} />
-
+        <Route path="kelas" element={< Kelas />} />
+        <Route path="profile-pengajar" element={< ProfilPengajar />} />
+        <Route path="detail-kelas" element={< DetailKelas />} />
+        <Route path="profile-pengajar" element={< ProfilePengajar />} />
+        <Route path="riwayat-transaksi" element={< RiwayatTransaksi />} />
+        <Route path="/pengajar/detail-kelas/:id" component={DetailKelas} />
+      
         {/* Tambahkan rute halaman pengajar lain di sini */}
       </Route>
     </Routes>
