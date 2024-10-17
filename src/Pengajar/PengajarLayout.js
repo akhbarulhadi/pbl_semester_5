@@ -7,7 +7,7 @@ function LayoutSidebar({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex-1 p-8 overflow-auto">
       {/* Sidebar */}
       <SidebarPengajar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -17,7 +17,7 @@ function LayoutSidebar({ children }) {
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* Konten */}
-        <main className="flex-1 overflow-y-auto p-8 bg-gray-100 mt-16 lg:ml-64">
+        <main className="flex-1 flex flex-col p-5 bg-gray-100 mt-16 lg:ml-64">
      <Outlet/>
         </main>
       </div>

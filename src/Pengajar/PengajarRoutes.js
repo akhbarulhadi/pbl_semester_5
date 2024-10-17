@@ -5,9 +5,9 @@ import FormIncome from "./FormIncome";
 import FormKelas from "./FormKelas";
 import Kelas from "./Kelas";
 import ProfilPengajar from "./ProflePengajar";
-import DetailKelas from "./DetailKelas";
 import RiwayatTransaksi from "./RiwayatTransaksi";
 import ProfilePengajar from "./ProflePengajar";
+import DetailKelas from "./DetailKelas";
 
 const PengajarRoutes = () =>   {
   return (
@@ -19,10 +19,10 @@ const PengajarRoutes = () =>   {
         <Route path="form-income" element={< FormIncome />} />
         <Route path="kelas" element={< Kelas />} />
         <Route path="profile-pengajar" element={< ProfilPengajar />} />
-        <Route path="detail-kelas" element={< DetailKelas />} />
         <Route path="profile-pengajar" element={< ProfilePengajar />} />
         <Route path="riwayat-transaksi" element={< RiwayatTransaksi />} />
-        <Route path="/pengajar/detail-kelas/:id" component={DetailKelas} />
+        <Route path="detail-kelas/:namaKelas" element={<DetailKelas />} />
+    
       
         {/* Tambahkan rute halaman pengajar lain di sini */}
       </Route>

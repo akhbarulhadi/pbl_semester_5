@@ -10,6 +10,7 @@ const RiwayatTransaksi = () => {
       norekening: "1234567890",
       namarekening: "John Doe",
       namabank: "Bank A",
+      waktu: "13:02",
       pemasukan: 500000,
       pengeluaran: 200000,
     },
@@ -20,6 +21,7 @@ const RiwayatTransaksi = () => {
       norekening: "0987654321",
       namarekening: "Jane Smith",
       namabank: "Bank B",
+      waktu: "08:20",
       pemasukan: 750000,
       pengeluaran: 300000,
     },
@@ -28,6 +30,8 @@ const RiwayatTransaksi = () => {
 
   return (
     <div className="overflow-x-auto">
+      <h2 className="text-2xl font-bold mb-4 text-gray-700">RiwayatTransaksi</h2>
+
       <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
         <thead>
           <tr className="bg-gray-200">
@@ -37,6 +41,7 @@ const RiwayatTransaksi = () => {
             <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">No. Rekening</th>
             <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Nama Rekening</th>
             <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Nama Bank</th>
+            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Waktu</th>
             <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Pemasukan</th>
             <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Pengeluaran</th>
           </tr>
@@ -50,6 +55,7 @@ const RiwayatTransaksi = () => {
               <td className="py-2 px-4 border-b border-gray-300">{transaction.norekening}</td>
               <td className="py-2 px-4 border-b border-gray-300">{transaction.namarekening}</td>
               <td className="py-2 px-4 border-b border-gray-300">{transaction.namabank}</td>
+              <td className="py-2 px-4 border-b border-gray-300">{transaction.waktu}</td>
               <td className="py-2 px-4 border-b border-gray-300">Rp {transaction.pemasukan.toLocaleString()}</td>
               <td className="py-2 px-4 border-b border-gray-300">Rp {transaction.pengeluaran.toLocaleString()}</td>
             </tr>
