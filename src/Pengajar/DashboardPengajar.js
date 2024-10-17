@@ -1,31 +1,79 @@
-import React from "react";
-import DataIncome from "./DataIncome";
+import React, { useEffect, useState } from "react";
+import DataIncome from "./DataIncome";  
 
-
-  const kelasTable = [
-    {
-      namaKelas: "Kelas Pemrograman Dasar",
-      jumlahPengikut: 150,
-      status: "Aktif",
-      penyelesaian: 75, // Persentase
-    },
-    {
-      namaKelas: "Kelas Desain Grafis",
-      jumlahPengikut: 200,
-      status: "Selesai",
-      penyelesaian: 100,
-    },
-    {
-      namaKelas: "Kelas Pemasaran Digital",
-      jumlahPengikut: 120,
-      status: "Aktif",
-      penyelesaian: 50,
-    },
-    // Tambahkan lebih banyak data sesuai kebutuhan
-  ];
+  // const kelasTable = [
+  //   {
+  //     namaKelas: "Kelas Pemrograman Dasar",
+  //     jumlahPengikut: 150,
+  //     status: "Aktif",
+  //     penyelesaian: 75, // Persentase
+  //   },
+  //   {
+  //     namaKelas: "Kelas Desain Grafis",
+  //     jumlahPengikut: 200,
+  //     status: "Selesai",
+  //     penyelesaian: 100,
+  //   },
+  //   {
+  //     namaKelas: "Kelas Pemasaran Digital",
+  //     jumlahPengikut: 120,
+  //     status: "Aktif",
+  //     penyelesaian: 50,
+  //   },
+  //   // Tambahkan lebih banyak data sesuai kebutuhan
+  // ];
 
 
 const DashboardPengajar = () => {
+  const [courses, setCourses] = useState([]);
+  const [totalJoinedCount, setTotalJoinedCount] = useState(0);
+  const [totalUser, setTotalUser] = useState(0);
+  const [totalKelas, setTotalKelas] = useState(0);
+
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        let response = await fetch('/api/pengajar/courses/dashboard', {
+          method: 'GET',
+          credentials: 'include',
+        });
+  
+        if (response.status === 401) { // Token mungkin kedaluwarsa
+          // Panggil refresh token
+          const refreshResponse = await fetch('/api/auth/refresh-token', {
+            method: 'POST',
+            credentials: 'include',
+          });
+  
+          if (refreshResponse.ok) {
+            // Coba ulang fetch courses setelah token diperbarui
+            response = await fetch('/api/pengajar/courses/dashboard', {
+              method: 'GET',
+              credentials: 'include',
+            });
+          } else {
+            throw new Error('Refresh token failed');
+          }
+        }
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setCourses(data.courses);
+        setTotalJoinedCount(data.total_joined_count);
+        setTotalUser(data.total_siswa);
+        setTotalKelas(data.total_courses);
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+  
+    fetchCourses();
+  }, []);
+
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
@@ -48,7 +96,7 @@ const DashboardPengajar = () => {
             />
           </svg>
         </DataIncome>
-        <DataIncome title="Total Siswa" total="$45,2K" rate="4.35%" levelUp>
+        <DataIncome title="Total Siswa" total={totalUser}>
           <svg
             className="fill-primary dark:fill-white"
             width="20"
@@ -71,7 +119,7 @@ const DashboardPengajar = () => {
             />
           </svg>
         </DataIncome>
-        <DataIncome title="Total Pengikut" total="2.450" rate="2.59%" levelUp>
+        <DataIncome title="Total Pengikut" total={totalJoinedCount}>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -90,7 +138,7 @@ const DashboardPengajar = () => {
             />
           </svg>
         </DataIncome>
-        <DataIncome title="Total Kelas" total="3.456" rate="0.95%" levelDown>
+        <DataIncome title="Total Kelas" total={totalKelas} rate="0.95%" levelDown>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -122,27 +170,29 @@ const DashboardPengajar = () => {
           <thead>
             <tr className="bg-gray-200">
               <th className="py-2 px-4 border-b">Nama Kelas</th>
+              <th className="py-2 px-4 border-b">Berbayar</th>
               <th className="py-2 px-4 border-b">Jumlah Pengikut</th>
               <th className="py-2 px-4 border-b">Status</th>
               <th className="py-2 px-4 border-b">Penyelesaian</th>
             </tr>
           </thead>
-          <tbody>
-            {kelasTable.map((kelas, index) => (
-              <tr key={index} className="hover:bg-gray-100">
-                <td className="py-2 px-4 border-b">{kelas.namaKelas}</td>
-                <td className="py-2 px-4 border-b">{kelas.jumlahPengikut}</td>
-                <td className="py-2 px-4 border-b">{kelas.status}</td>
+          <tbody className="text-center">
+            {courses.map((course) => (
+              <tr key={course.id_course} className="hover:bg-gray-100">
+                <td className="py-2 px-4 border-b">{course.course_title}</td>
+                <td className="py-2 px-4 border-b">{course.paid ? "Ya" : "Tidak"}</td>
+                <td className="py-2 px-4 border-b">{course.joined_count}</td>
+                <td className="py-2 px-4 border-b">{course.status_course}</td>
                 <td className="py-2 px-4 border-b">
                   <div className="relative w-full">
                     <div className="flex items-center">
                       <div className="w-full bg-gray-300 rounded h-2">
                         <div
                           className={`bg-green-500 h-2 rounded`}
-                          style={{ width: `${kelas.penyelesaian}%` }}
+                          style={{ width: `${course.completion_percentage}%` }}
                         ></div>
                       </div>
-                      <span className="ml-2 text-sm font-semibold">{kelas.penyelesaian}%</span>
+                      <span className="ml-2 text-sm font-semibold">{course.completion_percentage}%</span>
                     </div>
                   </div>
                 </td>
