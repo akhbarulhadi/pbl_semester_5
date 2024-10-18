@@ -1,129 +1,82 @@
-const express = require('express')
-const { createClient } = require("@supabase/supabase-js"); // Ubah dari import ke const
+const express = require('express');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
+const useragent = require('express-useragent');
+const geoip = require('geoip-lite');
+
+const authMiddleware = require('./middleware/authMiddleware');
+const authRouter = require('./routes/authRouter');
+const productRoutes = require('./routes/productRoutes');
+const coursesRoutes = require('./routes/coursesRoutes');
+const purchasedCoursesRoutes = require('./routes/purchasedCoursesRoutes');
+const transactionsRoutes = require('./routes/transactionsRoutes');
+
+const coursesPengajarRoutes = require('./routes/pengajar/coursesRoutes');
+const statistikAdminRoutes = require('./routes/admin/statistikRoutes');
+
 
 const app = express();
+const fs = require('fs');
+
 const port = 5000;
 
-app.use(express.json()); // Tambahkan ini
+// Middleware untuk parsing JSON dan Cookie
+app.use(express.json());
+app.use(cookieParser()); // Tambahkan ini untuk memparsing cookies
 
-// Buat client Supabase
-const supabaseUrl = process.env.SUPABASE_URL; // ! ini api project url supabase
-const supabaseKey = process.env.SUPABASE_KEY; // ! ini api anon public supabase
-const supabase = createClient(supabaseUrl, supabaseKey);
+app.use('/api/auth', authRouter); 
+app.use('/api/products', authMiddleware, productRoutes);
+app.use('/api/courses', authMiddleware, coursesRoutes);
+app.use('/api/course-purchased', authMiddleware, purchasedCoursesRoutes);
+app.use("/api/transactions", transactionsRoutes);
+
+app.use('/api/pengajar/courses', authMiddleware, coursesPengajarRoutes);
+app.use('/api/admin/statistik', authMiddleware, statistikAdminRoutes);
+
+
+app.use(useragent.express());
+
+app.set('trust proxy', 1); // 1 untuk proxy tunggal seperti Nginx atau Heroku
+
+
+app.get('/', (req, res) => {
+    const userIp = req.headers['x-forwarded-for'] || req.ip;
+    const referer = req.headers['referer'] || 'No referer';
+    const language = req.headers['accept-language'];
+    const cookies = req.headers['cookie'];
+    const geo = geoip.lookup(userIp);
+
+    // const log = `${new Date().toISOString()} - User IP: ${userIp}, Device: ${req.useragent.platform}, Browser: ${req.useragent.browser}\n`;
+    const log = `${new Date().toISOString()} - User IP: ${userIp}, Referer: ${referer}, Preferred Language: ${language}, Cookies: ${cookies}, Location: ${geo ? `${geo.city}, ${geo.country}` : 'Location not found'}, Device: ${req.useragent.platform}, Browser: ${req.useragent.browser}\n`;
+
+    fs.appendFile('access.log', log, (err) => {
+        if (err) {
+            console.error('Gagal menulis log:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+    });
+
+    console.log(log);
+    console.log('Referer:', referer);
+    console.log('Preferred Language:', language);
+    console.log('Cookies:', cookies);
+    console.log('Location:', geo);
+
+
+    res.send('Welcome to the landing page!');
+});
+
 
 app.get('/api', (req, res) => {
     res.send('Express Connected!');
 });
 
-app.get("/api/products", async (req, res) => {
-  try {
-    // Ambil data dari tabel
-    const { data, error } = await supabase
-      .from("table_product")
-      .select("*")
-      .order("id_product", { ascending: false }); // Mengurutkan dari yang terbaru
-
-    if (error) {
-      throw error;
-    }
-
-    // Kirim data sebagai respon
-    res.status(200).json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/products", async (req, res) => {
-    const { nama_product, quantity } = req.body; // Sesuaikan dengan kolom yang ada di tabel
-  
-    try {
-      const { data, error } = await supabase
-        .from("table_product")
-        .insert([{ nama_product, quantity }]); // Sesuaikan dengan struktur tabel
-  
-      if (error) throw error;
-  
-      res.status(201).json(data);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-});
-
-app.put("/api/products/:id_product", async (req, res) => {
-    const { id_product } = req.params; // Ambil id_product dari URL
-    const { nama_product, quantity } = req.body; // Data yang akan diperbarui
-
-    try {
-        const { data, error } = await supabase
-            .from("table_product")
-            .update({ nama_product, quantity }) // Data yang diperbarui
-            .eq("id_product", id_product); // Kondisi untuk memperbarui data
-
-        if (error) throw error;
-
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.delete("/api/products/:id_product", async (req, res) => {
-    const { id_product } = req.params; // Ambil id_product dari URL
-
-    try {
-        const { data, error } = await supabase
-            .from("table_product")
-            .delete() // Perintah untuk menghapus data
-            .eq("id_product", id_product); // Kondisi untuk menghapus data
-
-        if (error) throw error;
-
-        res.status(200).json({ message: "Data berhasil dihapus", data });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get("/api/products/:id_product", async (req, res) => {
-    const { id_product } = req.params; // Ambil id_product dari parameter URL
-
-    try {
-        // Query ke Supabase untuk mengambil data berdasarkan id
-        const { data, error } = await supabase
-            .from("table_product")
-            .select("*")
-            .eq("id_product", id_product) // Filter berdasarkan id
-            .single(); // Mengambil satu record
-
-        if (error) throw error;
-
-        if (data) {
-            // Jika data ditemukan, kembalikan dengan status 200
-            res.status(200).json(data);
-        } else {
-            // Jika data tidak ditemukan, kembalikan status 404
-            res.status(404).json({ message: "Data tidak ditemukan" });
-        }
-    } catch (error) {
-        // Tangani error dengan mengembalikan status 500
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
 app.get('/api/about', (req, res) => {
     res.send('About Page');
 });
 
-
 app.use("*", (req, res) => {
-    // * bisa gini juga YA
     res.status(404).send("Halaman tidak ditemukan");
-
-    // res.status(404);
-    // res.send("Halaman tidak ditemukan");
 });
 
 app.listen(port, () => {

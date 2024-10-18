@@ -66,7 +66,7 @@ const SemuaKursus = () => {
   return (
     <div className="flex">
       {/* Konten Utama */}
-      <section className="relative mt-20 bg-gradient-to-r from-purple-100 to-blue-200 w-full min-h-screen">
+      <section className="relative mt-20 bg-white w-full min-h-screen">
       <div className="w-full px-4 py-16 md:px-8 md:py-20">
             <div className="mb-12">
               <p className="text-2xl font-bold font-poppins text-[#6ee7b7]">#Belajar dari ahlinya</p>

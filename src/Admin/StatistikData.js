@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
 
 const options = {
@@ -24,24 +24,6 @@ const options = {
       show: false,
     },
   },
-  responsive: [
-    {
-      breakpoint: 1024,
-      options: {
-        chart: {
-          height: 300,
-        },
-      },
-    },
-    {
-      breakpoint: 1366,
-      options: {
-        chart: {
-          height: 350,
-        },
-      },
-    },
-  ],
   stroke: {
     width: [2, 2],
     curve: 'straight',
@@ -77,9 +59,7 @@ const options = {
   },
   xaxis: {
     type: 'category',
-    categories: [
-      'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'
-    ],
+    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     axisBorder: {
       show: false,
     },
@@ -102,21 +82,49 @@ const StatistikData = () => {
   const [state, setState] = useState({
     series: [
       {
-        name: 'Product One',
-        data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
+        name: 'Total Pembelian',
+        data: [],  // Data will come from API
       },
       {
-        name: 'Product Two',
-        data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
+        name: 'Total Pengunjung',
+        data: [],  // Data will come from API
       },
     ],
   });
 
-  const handleReset = () => {
-    setState((prevState) => ({
-      ...prevState,
-    }));
-  };
+  const months = ['2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06', '2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12'];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [purchasesRes, visitorsRes] = await Promise.all([
+          fetch('/api/admin/statistik/total-purchases').then(res => res.json()),
+          fetch('/api/admin/statistik/total-visitors').then(res => res.json()),
+        ]);
+
+        // Initialize with zeroes for all months
+        const purchasesData = months.map(month => purchasesRes.purchasesPerMonth[month] || 0);
+        const visitorsData = months.map(month => visitorsRes.visitorsPerMonth[month] || 0);
+
+        setState({
+          series: [
+            {
+              name: 'Total Pembelian',
+              data: purchasesData,
+            },
+            {
+              name: 'Total Pengunjung',
+              data: visitorsData,
+            },
+          ],
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
@@ -128,7 +136,7 @@ const StatistikData = () => {
             </span>
             <div className="w-full">
               <p className="font-semibold text-primary">Total Pembelian</p>
-              <p className="text-sm font-medium">12.04.2022 - 12.05.2022</p>
+              <p className="text-sm font-medium">01.01.2024 - 31.12.2024</p>
             </div>
           </div>
           <div className="flex min-w-47.5">
@@ -137,7 +145,7 @@ const StatistikData = () => {
             </span>
             <div className="w-full">
               <p className="font-semibold text-info">Total Pengunjung</p>
-              <p className="text-sm font-medium">12.04.2022 - 12.05.2022</p>
+              <p className="text-sm font-medium">01.01.2024 - 31.12.2024</p>
             </div>
           </div>
         </div>

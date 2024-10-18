@@ -1,63 +1,93 @@
-// DetailKelas.js
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 const DetailKelas = () => {
-  const location = useLocation(); // Mendapatkan state dari Link
-  const kelas = location.state?.kelas; // Mengakses data kelas dari state
+  const { id_course } = useParams(); // Mengambil ID kursus dari URL
+  const [course, setCourse] = useState(null); // State untuk menyimpan data kursus
+  const [loading, setLoading] = useState(true); // Status loading
+  const [error, setError] = useState(null); // Status error
 
-  if (!kelas) {
-    return <p>Data kelas tidak tersedia!</p>;
-  }
+  useEffect(() => {
+    // Mengambil data kursus dari backend
+    const fetchCourseData = async () => {
+      try {
+        const response = await axios.get(`/api/pengajar/courses/${id_course}`); // Ganti dengan URL backend
+        setCourse(response.data); // Menyimpan data kursus
+      } catch (err) {
+        setError(err.response?.data?.error || "Terjadi kesalahan saat mengambil data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [id_course]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="text-center mt-8 text-xl text-red-500">{error}</div>;
+  if (!course) return <div className="text-center mt-8 text-xl text-red-500">Kelas tidak ditemukan.</div>;
 
   return (
-    <section className=" max-w-6xl mx-auto mt-20 p-6 dark:bg-gray-800 ml-64">
- <div className="overflow-x-auto">
-  <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-400">
-    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-      <tr>
-        <th scope="col" className="py-3 px-6">
-          Nama Kelas
-        </th>
-        <th scope="col" className="py-3 px-6">
-          Jumlah Pengikut
-        </th>
-        <th scope="col" className="py-3 px-6">
-          Status
-        </th>
-        <th scope="col" className="py-3 px-6">
-          Persentase Selesai
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-    
-        <tr
-          key={kelas.id}
-          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-        >
-          <th
-            scope="row"
-            className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-          >
-            <Link
-              to="/pengajar/kelas/detail"
-              state={{ kelas }}
-              className="hover:underline"
-            >
-              {kelas.nama}
-            </Link>
-          </th>
-          <td className="py-4 px-6">{kelas.jumlahPengikut}</td>
-          <td className="py-4 px-6">{kelas.status}</td>
-          <td className="py-4 px-6">{kelas.persentaseSelesai}%</td>
-        </tr>
+    <div className="p-8 bg-white shadow-lg rounded-xl max-w-3xl mx-auto">
+      {/* Header Title */}
+      <h2 className="text-2xl font-extrabold mb-6 text-gray-800">Detail Kelas</h2>
 
-    </tbody>
-  </table>
-</div>
+      {/* Nama Kelas */}
+      <h1 className="text-3xl font-medium text-gray-900 mb-6">{course.course_title}</h1>
 
-    </section>
+      {/* Informasi Kelas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+        <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+          <p className="text-medium">
+            <strong>Deskripsi Kelas:</strong> {course.course_description}
+          </p>
+        </div>
+        <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+          <p className="text-medium">
+            <strong>Harga:</strong> Rp {course.price.toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+          <p className="text-medium">
+            <strong>Status Kelas:</strong> {course.status_course}
+          </p>
+        </div>
+        <div className="bg-gray-50 p-4 rounded-lg shadow-md">
+          <p className="text-medium">
+            <strong>Tipe Kelas:</strong> {course.online ? "Online" : "Offline"}
+          </p>
+        </div>
+      </div>
+
+      {/* Penyelesaian & Progress Bar */}
+      {/* Hanya ditampilkan jika ada status penyelesaian yang relevan */}
+      {/* {course.status_course === "Pending" && (
+        <div className="mb-8">
+          <h3 className="text-xl font-medium text-gray-700 mb-4">Progress Kelas</h3>
+          <div className="w-full bg-gray-300 rounded-full h-4 mb-2">
+            <div className="bg-blue-500 h-4 rounded-full" style={{ width: `50%` }}></div>
+          </div>
+          <p className="text-medium text-gray-600">50% Selesai</p>
+        </div>
+      )} */}
+
+      {/* Informasi Lainnya */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="bg-gray-100 p-4 rounded-lg shadow-md">
+          <p className="text-medium font-medium text-green-600">
+            Dibuat pada: {new Date(course.created_at).toLocaleDateString()}
+          </p>
+        </div>
+        {course.updated_at && (
+          <div className="bg-gray-100 p-4 rounded-lg shadow-md">
+            <p className="text-medium font-medium text-blue-600">
+              Terakhir diperbarui: {new Date(course.updated_at).toLocaleDateString()}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

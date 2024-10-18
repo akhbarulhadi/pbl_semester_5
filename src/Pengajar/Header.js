@@ -34,7 +34,7 @@ function Header({ sidebarOpen, setSidebarOpen }) {
 
         {/* Teks Selamat Datang di sebelah Profil */}
         <div className="flex-grow text-center text-lg font-semibold">
-          Pengajar
+          {/* Pengajar */}
         </div>
 
         {/* Menu Profil dan Pengaturan di pojok kanan */}
