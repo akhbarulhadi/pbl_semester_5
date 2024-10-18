@@ -2,18 +2,36 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); 
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Logic untuk login, seperti validasi, API call, dll.
-    console.log("Email:", email, "Password:", password);
-    // Setelah login berhasil, bisa diarahkan ke halaman lain
-    navigate("/dashboard");
+  
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
+  
+      if (!response.ok) {
+        const { error } = await response.json();
+        setError(error);
+        return;
+      }
+      // Redirect ke halaman lain, misalnya ke halaman dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      setError('Terjadi kesalahan. Silakan coba lagi.');
+      console.error(error);
+    }
   };
-
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">

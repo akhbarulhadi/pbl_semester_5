@@ -59,16 +59,16 @@ const SemuaKursus = () => {
   return (
     <div className="flex">
       {/* Konten Utama */}
-      <section className="relative mt-8 w-full min-h-screen">
-        <div className="w-full px-4 py-16 md:px-8 md:py-20">
-          <div className="mb-12">
-            <p className="text-2xl font-bold font-poppins text-[#6ee7b7]">#Belajar dari ahlinya</p>
-            <h1 className="text-5xl font-bold font-poppins text-[#030712] mb-4">Modul Pelatihan</h1>
-            <p className="text-xl text-[#3f3f46] font-poppins">
-              Temukan berbagai modul pelatihan yang dirancang untuk <br />meningkatkan keterampilan Anda di berbagai bidang.
-              Jelajahi koleksi kami <br /> dan pilih yang paling sesuai dengan kebutuhan Anda.
-            </p>
-          </div>
+      <section className="relative mt-20 bg-gradient-to-r from-purple-100 to-blue-200 w-full min-h-screen">
+      <div className="w-full px-4 py-16 md:px-8 md:py-20">
+            <div className="mb-12">
+              <p className="text-2xl font-bold font-poppins text-[#6ee7b7]">#Belajar dari ahlinya</p>
+              <h1 className="text-5xl font-bold font-poppins text-[#030712] mb-4">Modul Pelatihan</h1>
+              <p className="text-xl text-[#3f3f46] font-poppins">
+                Temukan berbagai modul pelatihan yang dirancang untuk <br />meningkatkan keterampilan Anda di berbagai bidang.
+                Jelajahi koleksi kami <br /> dan pilih yang paling sesuai dengan kebutuhan Anda.
+              </p>
+            </div>
 
           <div className="flex flex-wrap md:flex-nowrap gap-8">
             <main className="flex-1">

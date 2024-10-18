@@ -3,7 +3,7 @@ import { FaBars } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 
-function HeaderAdmin({ sidebarOpen, setSidebarOpen }) {
+function Header({ sidebarOpen, setSidebarOpen }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -34,7 +34,7 @@ function HeaderAdmin({ sidebarOpen, setSidebarOpen }) {
 
         {/* Teks Selamat Datang di sebelah Profil */}
         <div className="flex-grow text-center text-lg font-semibold">
-          Admin
+          {/* Pengajar */}
         </div>
 
         {/* Menu Profil dan Pengaturan di pojok kanan */}
@@ -63,7 +63,7 @@ function HeaderAdmin({ sidebarOpen, setSidebarOpen }) {
             <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg">
               <ul>
                 <li className="px-4 py-2 hover:bg-gray-100">
-                  <Link to="/#">Profile Saya</Link>
+                  <Link to="/pengajar/profile-pengajar">Profile Saya</Link>
                 </li>
                 <li className="px-4 py-2 hover:bg-gray-100">
                   <a href="/#">Pengaturan</a>
@@ -77,4 +77,4 @@ function HeaderAdmin({ sidebarOpen, setSidebarOpen }) {
   );
 }
 
-export default HeaderAdmin;
+export default Header;

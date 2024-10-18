@@ -1,20 +1,28 @@
-import React from 'react';
-import HeaderAdmin from './HeaderAdmin';
-import SidebarAdmin from './SidebarAdmin';
-import { Outlet } from 'react-router-dom';
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
+import SidebarAdmin from "./SidebarAdmin";
+import HeaderAdmin from "./HeaderAdmin";
 
-const AdminLayout = ({ children }) => {
-    return (
-        <div className='relative min-h-screen bg-white'>
-            <HeaderAdmin />
-            <div className='flex'>
-                <SidebarAdmin />
-                <main className='flex-1 p-4'>
-                    <Outlet/>
-                </main>
-            </div>
-        </div>
-    );
-};
+function LayoutSidebar({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-export default AdminLayout;
+  return (
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar */}
+      <SidebarAdmin sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+      {/* Header */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <HeaderAdmin sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+        {/* Konten */}
+        <main className="flex-1 overflow-y-auto p-8 bg-gray-100 mt-16 lg:ml-64">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default LayoutSidebar;

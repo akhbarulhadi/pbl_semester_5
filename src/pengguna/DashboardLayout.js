@@ -6,7 +6,7 @@ const DashboardLayout = () => {
   return (
     <div className="flex">
       <NavbarSidebar /> {/* Menyertakan Sidebar Navbar */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 overflow-y-auto p-8 bg-white mt-16 lg:ml-64">
         <Outlet /> {/* Ini akan me-render child routes */}
       </div>
     </div>
