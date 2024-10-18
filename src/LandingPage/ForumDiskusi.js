@@ -38,7 +38,6 @@ const ForumDiskusi = () => {
   return (
     <div>
       {/* Forum Diskusi Section */}
-      <section className="relative mt-20 bg-[#f0f9ff] w-full">
         <div className="w-full px-4 py-16 md:px-8 md:py-20">
           {/* Intro Text */}
           <div className="mb-12">
@@ -137,7 +136,6 @@ const ForumDiskusi = () => {
             </form>
           </div>
         </div>
-      </section>
     </div>
   );
 };

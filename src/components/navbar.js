@@ -31,37 +31,37 @@ const Navbar = () => {
       initial="hidden"
       whileInView={"show"}
       viewport={{ once: false, amount: 0.7 }}
-      className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+      className="fixed top-0 left-0 z-50 w-full bg-gray-600 shadow-md border-b border-gray-700"
     >
-      <div className="px-3 py-3 lg:px-5 lg:pl-3">
+      <div className="px-2 py-2 lg:px-3 lg:pl-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-start rtl:justify-end">
-            <a href="/" className="flex ms-2 md:me-24">
-              <img src={appleLogo} className="h-30 w-16 me-3" alt="apple" />
-              <span className="self-center text-xl font-bold sm:text-2xl whitespace-nowrap dark:text-white">APPLE</span>
-              <span className="self-center text-xl font-bold sm:text-2xl whitespace-nowrap text-gray-500 dark:text-gray-300">NESIA</span>
+            <a href="/" className="flex ms-2 md:me-16">
+              <img src={appleLogo} className="h-14 w-16 me-2" alt="apple" />
+              <span className="self-center text-lg font-bold sm:text-xl whitespace-nowrap text-white">APPLE</span>
+              <span className="self-center text-lg font-bold sm:text-xl whitespace-nowrap text-gray-300">NESIA</span>
             </a>
-            <ul className="hidden lg:flex items-center space-x-4">
+            <ul className="hidden lg:flex items-center space-x-3">
               <li>
-                <Link to="/" className="text-black font-poppins text-xl px-4 py-2 rounded-2xl">Home</Link>
+                <Link to="/" className="text-black font-poppins text-lg px-3 py-1 rounded-full">Home</Link>
               </li>
               <li>
-                <Link to="/modul-pelatihan" className="text-black font-poppins text-xl px-4 py-2 rounded-2xl">Modul pelatihan</Link>
+                <Link to="/modul-pelatihan" className="text-black font-poppins text-lg px-3 py-1 rounded-full">Modul pelatihan</Link>
               </li>
               <li>
-                <Link to="/forum-diskusi" className="text-black font-poppins text-xl px-4 py-2 rounded-2xl">Forum diskusi</Link>
+                <Link to="/forum-diskusi" className="text-black font-poppins text-lg px-3 py-1 rounded-full">Forum diskusi</Link>
               </li>
               <li>
-                <Link to="/services" className="text-black font-poppins text-xl px-4 py-2 rounded-2xl">Pelaporan & Statistik</Link>
+                <Link to="/services" className="text-black font-poppins text-lg px-3 py-1 rounded-full">Pelaporan & Statistik</Link>
               </li>
               <li>
-                <Link to="/sertifikat" className="text-black font-poppins text-xl px-4 py-2 rounded-2xl">Sertifikasi</Link>
+                <Link to="/sertifikat" className="text-black font-poppins text-lg px-3 py-1 rounded-full">Sertifikasi</Link>
               </li>
             </ul>
           </div>
-          <div className="flex items-center space-x-4">
-            <Link to="/login" className="text-white bg-[#007BFF] hover:bg-black px-4 py-2 rounded-2xl text-lg">Log In</Link>
-            <Link to="/signup" className="text-white bg-[#007BFF] hover:bg-black px-4 py-2 rounded-2xl text-lg">Sign Up</Link>
+          <div className="flex items-center space-x-2">
+            <Link to="/login" className="text-white bg-[#007BFF] hover:bg-black px-3 py-1 rounded-full text-lg">Log In</Link>
+            <Link to="/signup" className="text-white bg-[#007BFF] hover:bg-black px-3 py-1 rounded-full text-lg">Sign Up</Link>
             <button 
               onClick={toggleMobileMenu} 
               className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" 
@@ -85,11 +85,11 @@ const Navbar = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
-          <ul className="space-y-4">
+          <ul className="space-y-2">
             <li>
               <Link 
                 to="/modul-pelatihan" 
-                className="block text-black text-center bg-[#00FFFF] hover:bg-white px-4 py-2 rounded-2xl"
+                className="block text-black text-center bg-[#00FFFF] hover:bg-white px-3 py-1 rounded-full"
                 onClick={toggleMobileMenu} // Menutup menu setelah klik
               >
                 Modul pelatihan
@@ -98,7 +98,7 @@ const Navbar = () => {
             <li>
               <Link 
                 to="/forum-diskusi" 
-                className="block text-black text-center bg-[#FF00FF] hover:bg-white px-4 py-2 rounded-2xl"
+                className="block text-black text-center bg-[#FF00FF] hover:bg-white px-3 py-1 rounded-full"
                 onClick={toggleMobileMenu} // Menutup menu setelah klik
               >
                 Forum diskusi
@@ -107,7 +107,7 @@ const Navbar = () => {
             <li>
               <Link 
                 to="/services" 
-                className="block text-black text-center bg-[#FFC83E] hover:bg-white px-4 py-2 rounded-2xl"
+                className="block text-black text-center bg-[#FFC83E] hover:bg-white px-3 py-1 rounded-full"
                 onClick={toggleMobileMenu} // Menutup menu setelah klik
               >
                 Pelaporan & Statistik
@@ -116,7 +116,7 @@ const Navbar = () => {
             <li>
               <Link 
                 to="/sertifikat" 
-                className="block text-black text-center bg-[#9E9C9C] hover:bg-white px-4 py-2 rounded-2xl"
+                className="block text-black text-center bg-[#9E9C9C] hover:bg-white px-3 py-1 rounded-full"
                 onClick={toggleMobileMenu} // Menutup menu setelah klik
               >
                 Sertifikasi
@@ -125,7 +125,7 @@ const Navbar = () => {
             <li>
               <Link 
                 to="/manajemen-admin" 
-                className="block text-black text-center bg-blue-500 hover:bg-white px-4 py-2 rounded-2xl"
+                className="block text-black text-center bg-blue-500 hover:bg-white px-3 py-1 rounded-full"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Manajemen admin

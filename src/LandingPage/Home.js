@@ -37,7 +37,7 @@ const Drawer = () => {
   };
 
   return (
-    <section className="bg-[#f0f9ff]"> {/* Set background color to light gray */}
+    <section className="bg-"> {/* Set background color to light gray */}
       {/* Container */}
       <div className="mx-auto w-full max-w-7xl px-5 py-12 md:px-10 md:py-16 lg:py-20 mt-20">
         {/* Component */}

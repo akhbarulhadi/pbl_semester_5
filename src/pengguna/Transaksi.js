@@ -24,14 +24,13 @@ const Transaksi = () => {
   ];
 
   return (
-    <section className="relative mt-20 bg-gradient-to-r from-purple-100 to-blue-200 w-full min-h-screen">
-    <div className="p-4 md:ml-72 mt-24 min-h-screen mx-auto">
+    <div className="p-4 md:ml-64 mt-16 min-h-screen mx-auto">
       <div className="mb-4">
-        <h2 className="text-xl font-bold">Riwayat Transaksi</h2>
+        <h2 className="text-2xl font-bold">Riwayat Transaksi</h2>
       </div>
       <div className="overflow-x-auto shadow-md rounded-lg">
-        <table className="min-w-full bg-white">
-          <thead>
+        <table className="min-w-full bg-gray-50"> {/* Ganti bg-white dengan bg-gray-50 */}
+          <thead className="bg-gray-200"> {/* Tambahkan latar belakang untuk header */}
             <tr>
               <th className="px-6 py-4 border-b text-left">ID Transaksi</th>
               <th className="px-6 py-4 border-b text-left">Nama Kursus</th>
@@ -41,7 +40,7 @@ const Transaksi = () => {
           </thead>
           <tbody>
             {transactions.map(transaction => (
-              <tr key={transaction.id}>
+              <tr key={transaction.id} className="hover:bg-gray-100"> {/* Tambahkan efek hover */}
                 <td className="px-6 py-4 border-b">{transaction.id}</td>
                 <td className="px-6 py-4 border-b">{transaction.courseName}</td>
                 <td className="px-6 py-4 border-b">{transaction.amount}</td>
@@ -56,7 +55,6 @@ const Transaksi = () => {
         </table>
       </div>
     </div>
-    </section>
   );
 };
 

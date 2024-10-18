@@ -13,14 +13,13 @@ const Sertifikat = () => {
   };
 
   return (
-    <section className="relative mt-20 bg-[#f0f9ff] w-full">
       <div className="w-full px-4 py-16 md:px-8 md:py-20">
         {/* Intro Text */}
         <div className="mb-12">
-          <h1 className="text-6xl font-bold font-poppins text-[#030712] mb-4">
+          <h1 className="text-4xl font-bold font-poppins text-[#030712] mb-4">
             Sertifikat
           </h1>
-          <p className="text-2xl text-[#3f3f46] font-poppins">
+          <p className="text-xl text-[#3f3f46] font-poppins">
             Fitur sertifikat ini dirancang untuk memberikan Anda akses mudah<br />
             untuk melihat dan mengelola sertifikat yang telah Anda peroleh.<br />
             Pastikan untuk memeriksa sertifikat Anda dan memvalidasi keasliannya di sini.
@@ -28,7 +27,7 @@ const Sertifikat = () => {
         </div>
 
         {/* Card Container */}
-        <div className="relative bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div className="relative bg-gray dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
           {/* Card Body with Table */}
           <div className="relative overflow-x-auto p-8">
             <table className="w-full text-lg text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -88,7 +87,6 @@ const Sertifikat = () => {
           </div>
         </div>
       </div>
-    </section>
   );
 };
 

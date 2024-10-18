@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -18,6 +19,11 @@ code {
     width: 75%; /* Misalnya, atur sesuai kebutuhan */
   }
 }
+
+.h-144 {
+  height: 36rem; /* 144 unit, sesuaikan dengan kebutuhan */
+}
+
 
 /* src/index.css */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -61,6 +67,30 @@ code {
   display: flex;
   animation: marquee-right 10s linear infinite;
 }
+
+/* PurchasePage.css atau styles.css */
+.item-kp {
+  display: flex;
+  align-items: center; /* Rata tengah secara vertikal */
+  margin-bottom: 1rem; /* Spasi bawah antar item */
+}
+
+.icon-box {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  width: 24px; /* Atur ukuran ikon sesuai kebutuhan */
+  height: auto;
+}
+
+.value {
+  font-size: 16px; /* Atur ukuran font sesuai kebutuhan */
+  color: #333; /* Warna teks */
+  margin-left: 8px; /* Spasi antara ikon dan teks */
+}
+
 
 
 @tailwind base;

@@ -13,6 +13,8 @@ import Usidebar from './Usidebar';
 import LihatKelasDetail from './LihatDetailKelas';
 import MulaiKelas from './MulaiKelas';
 import DetailTransaksi from './DetailTransaksi';
+import Pembelian from './Pembelian'; // Ganti dengan path yang sesuai
+import DetailPembelian from './DetailPembelian';
 import NavbarLayout from './navbarLayout'; // Pastikan NavbarLayout diimpor
 
 const PenggunaRoutes = () => {
@@ -27,7 +29,6 @@ const PenggunaRoutes = () => {
         <Route path="dashboardU" element={<DashboardU />} />
         <Route path="profile" element={<ProfileU />} />
         <Route path="Usidebar" element={<Usidebar />} />
-
       </Route>
 
       {/* Rute tanpa sidebar dengan navbar khusus */}
@@ -37,7 +38,8 @@ const PenggunaRoutes = () => {
         <Route path="transaksi/:id" element={<DetailTransaksi />} />
         <Route path="kursus/:id" element={<DetailKursus />} />
         <Route path="semua-kursus" element={<SemuaKursus />} />
-
+        <Route path="/pembelian/:id" element={<Pembelian />} />
+        <Route path="/detailpembelian/:id" element={<DetailPembelian />} />
       </Route>
     </Routes>
   );

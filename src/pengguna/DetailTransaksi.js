@@ -23,38 +23,37 @@ const DetailTransaksi = () => {
       status: "Dibatalkan",
       metodePembayaran: "Kartu Kredit",
     },
-    // Tambahkan lebih banyak data transaksi jika perlu
   ];
 
   // Cari transaksi yang sesuai dengan id
   const transaksi = riwayatTransaksi.find(t => t.id === parseInt(id));
 
   return (
-    <section className="relative mt-20 bg-gradient-to-r from-purple-100 to-blue-200 w-full min-h-screen">
-      <div className="container md:ml-72 mx-auto p-6">
+    <section className="relative mt-16 w-full min-h-screen">
+      <div className="container md:ml-16 mx-auto p-4">
         {/* Jika transaksi ditemukan */}
         {transaksi ? (
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <h1 className="text-4xl font-bold text-blue-700 mb-4">Detail Transaksi</h1>
-            <h2 className="text-2xl font-semibold text-blue-600 mb-4">{transaksi.judulKelas}</h2>
-            <p className="text-gray-700 mb-4">Tanggal Pembelian: {transaksi.tanggalPembelian}</p>
-            <p className="text-gray-700 mb-4">Total Biaya: {transaksi.totalBiaya}</p>
-            <p className="text-gray-700 mb-4">Status: 
+          <div className="bg-gray-200 p-6 rounded-lg shadow-md">
+            <h1 className="text-2xl font-bold text-blue-600 mb-2">Detail Transaksi</h1>
+            <h2 className="text-xl font-semibold text-blue-500 mb-2">{transaksi.judulKelas}</h2>
+            <p className="text-gray-700 mb-2 text-sm">Tanggal Pembelian: {transaksi.tanggalPembelian}</p>
+            <p className="text-gray-700 mb-2 text-sm">Total Biaya: {transaksi.totalBiaya}</p>
+            <p className="text-gray-700 mb-2 text-sm">Status: 
               <span className={`ml-1 ${transaksi.status === 'Berhasil' ? 'text-green-500' : 'text-red-500'}`}>
                 {transaksi.status}
               </span>
             </p>
-            <p className="text-gray-700 mb-4">Metode Pembayaran: {transaksi.metodePembayaran}</p>
+            <p className="text-gray-700 mb-4 text-sm">Metode Pembayaran: {transaksi.metodePembayaran}</p>
 
-            <Link to="/pengguna/dashboardU" className="inline-block mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition">
+            <Link to="/pengguna/dashboardU" className="inline-block mt-2 px-4 py-1 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">
               Kembali ke Dashboard
             </Link>
           </div>
         ) : (
           // Jika transaksi tidak ditemukan
           <div className="text-center">
-            <h2 className="text-2xl font-semibold text-red-500">Transaksi tidak ditemukan</h2>
-            <Link to="/pengguna/dashboardU" className="inline-block mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition">
+            <h2 className="text-xl font-semibold text-red-500">Transaksi tidak ditemukan</h2>
+            <Link to="/pengguna/dashboardU" className="inline-block mt-2 px-4 py-1 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">
               Kembali ke Dashboard
             </Link>
           </div>

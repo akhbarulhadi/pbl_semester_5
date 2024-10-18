@@ -65,7 +65,7 @@ const ModulPelatihan = () => {
   );
 
   return (
-    <section className="relative mt-20 bg-[#f0f9ff] w-full">
+    <section className="relative mt-8 w-full">
       <div className="w-full px-4 py-16 md:px-8 md:py-20">
         {/* Teks di atas */}
         <div className="mb-12">

@@ -40,34 +40,34 @@ const LihatKelasDetail = () => {
   const kelas = kelasYangDiikuti.find(k => k.id === parseInt(id));
 
   return (
-    <section className="relative mt-20 bg-gradient-to-r from-purple-100 to-blue-200 w-full min-h-screen">
-      <div className="container md:ml-72 mx-auto p-6">
+    <section className="relative mt-16 w-full min-h-screen">
+      <div className="container md:ml-16 mx-auto p-4">
         {kelas ? (
-          <div className="bg-white p-8 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
-            <img src={kelas.gambar} alt={kelas.judul} className="w-full h-64 object-cover rounded-lg mb-4" />
-            <h1 className="text-4xl font-bold text-blue-700 mb-4">{kelas.judul}</h1>
-            <p className="text-gray-700 mb-4">{kelas.deskripsi}</p>
+          <div className="bg-gray-200 p-6 rounded-lg shadow-md transition-transform duration-300 hover:scale-105">
+            <img src={kelas.gambar} alt={kelas.judul} className="w-full h-48 object-cover rounded-lg mb-3" />
+            <h1 className="text-2xl font-bold text-black mb-3">{kelas.judul}</h1>
+            <p className="text-black mb-3 text-sm">{kelas.deskripsi}</p>
 
-            <div className="mb-4">
-              <p className="text-gray-700"><strong>Durasi:</strong> {kelas.durasi}</p>
-              <p className="text-gray-700"><strong>Tanggal Mulai:</strong> {kelas.tanggalMulai}</p>
-              <p className="text-gray-700"><strong>Instruktur:</strong> {kelas.instruktur}</p>
-              <p className="text-gray-700"><strong>Status:</strong> 
+            <div className="mb-3">
+              <p className="text-black text-sm"><strong>Durasi:</strong> {kelas.durasi}</p>
+              <p className="text-black text-sm"><strong>Tanggal Mulai:</strong> {kelas.tanggalMulai}</p>
+              <p className="text-black text-sm"><strong>Instruktur:</strong> {kelas.instruktur}</p>
+              <p className="text-black text-sm"><strong>Status:</strong> 
                 <span className={`ml-1 ${kelas.status === 'Sedang Berlangsung' ? 'text-green-500' : 'text-yellow-500'}`}>
                   {kelas.status}
                 </span>
               </p>
             </div>
 
-            <Link to="/pengguna/dashboardU" className="inline-block mt-4 mr-3 px-6 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105">
+            <Link to="/pengguna/dashboardU" className="inline-block mt-3 px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out text-sm">
               Kembali ke Dashboard
             </Link>
 
           </div>
         ) : (
           <div className="text-center">
-            <h2 className="text-2xl font-semibold text-red-500">Kelas tidak ditemukan</h2>
-            <Link to="/pengguna/dashboardU" className="inline-block mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out">
+            <h2 className="text-xl font-semibold text-red-500">Kelas tidak ditemukan</h2>
+            <Link to="/pengguna/dashboardU" className="inline-block mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition duration-300 ease-in-out text-sm">
               Kembali ke Dashboard
             </Link>
           </div>

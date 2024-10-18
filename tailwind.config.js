@@ -11,6 +11,9 @@ module.exports = withMT({
   ],
   theme: {
     extend: {
+      flexShrink: {
+        2: '2'
+      },
       animation: {
         marquee: "marquee 25s linear infinite",
         marquee2: "marquee2 25s linear infinite",
