@@ -81,7 +81,7 @@ const KursusSaya = () => {
         </div>
 
         {/* Tombol navigasi tambahan */}
-        <div className="md:ml-72 mt-4 text-center">
+        <div className="mt-4 text-center">
           <Link to="/pengguna/semua-kursus">
             <button className="px-4 py-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105">
               Lihat Semua Kursus
