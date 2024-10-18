@@ -23,9 +23,9 @@ const KursusSaya = () => {
   );
 
   return (
-      <div className="w-full px-4 py-8 md:px-8 md:py-12 mt-8">
+    <div className="container mx-auto p-3">
         {/* Teks di atas */}
-        <div className="mb-8 md:ml-64">
+        <div className="mb-8 ">
           <h1 className="text-2xl font-bold text-[#030712] mb-2">Kursus Saya</h1>
           <p className="text-lg text-[#3f3f46]">
             Upgrade terus ilmu dan pengalaman <br />
@@ -34,7 +34,7 @@ const KursusSaya = () => {
         </div>
 
         {/* Input untuk pencarian */}
-        <div className="md:ml-64 mb-4">
+        <div className="mb-4">
           <input
             type="text"
             placeholder="Cari kursus..."
@@ -45,7 +45,7 @@ const KursusSaya = () => {
         </div>
 
         {/* Daftar kursus */}
-        <div className="md:ml-64 mt-8 mx-auto p-2">
+        <div className="mt-8 mx-auto p-2">
           {filteredCourses.length > 0 ? (
             <ul className="space-y-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredCourses.map(course => (

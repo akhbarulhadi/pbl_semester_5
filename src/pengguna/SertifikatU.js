@@ -6,8 +6,7 @@ const SertifikatU = () => {
   const sertifikatList = []; // Kosongkan untuk menunjukkan tidak ada sertifikat
 
   return (
-    <div className="p-4 md:ml-56 mt-8 min-h-screen mx-auto">
-      <div className="container mx-auto p-6 md:p-10">
+    <div className="container mx-auto p-3">
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Halaman Sertifikat</h1>
         <Link to="/pengguna/kursus" className="text-blue-500 mb-6 inline-block">
           Kembali ke Kursus Saya
@@ -22,7 +21,7 @@ const SertifikatU = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          <div className="grid grid-cols-1 grid-cols-2 gap-6 mt-8">
             {sertifikatList.map(sertifikat => (
               <div key={sertifikat.id} className="bg-gray-200 border rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300"> 
                 <h2 className="text-lg font-semibold text-gray-800">{sertifikat.judul}</h2>
@@ -33,7 +32,6 @@ const SertifikatU = () => {
           </div>
         )}
       </div>
-    </div>
   );
 };
 

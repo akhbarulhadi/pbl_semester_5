@@ -28,8 +28,7 @@ const DashboardU = () => {
   ]; // Kosongkan untuk menunjukkan tidak ada transaksi
 
   return (
-    <section className="relative mt-16 w-full min-h-screen bg-white">
-      <div className="container md:ml-64 mx-auto p-3">
+      <div className="container mx-auto p-3">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-black-600">Welcome to Your Dashboard</h1>
           <p className="text-sm text-gray-600">Berikut adalah kelas yang sedang Anda ikuti.</p>
@@ -105,7 +104,6 @@ const DashboardU = () => {
           </>
         )}
       </div>
-    </section>
   );
 };
 

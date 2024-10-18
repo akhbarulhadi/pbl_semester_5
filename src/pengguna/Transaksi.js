@@ -24,7 +24,7 @@ const Transaksi = () => {
   ];
 
   return (
-    <div className="p-4 md:ml-64 mt-16 min-h-screen mx-auto">
+    <div className="container mx-auto p-3">
       <div className="mb-4">
         <h2 className="text-2xl font-bold">Riwayat Transaksi</h2>
       </div>
