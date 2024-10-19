@@ -4,6 +4,8 @@ import DashboardAdmin from "./DashboardAdmin";
 import DaftarPengajar from "./DaftarPengajar";
 import RiwayatTransaksi from "./RiwayatTransaksi";
 import FormPengajar from "./FormPengajar";
+import ListPeserta from "./ListPeserta";
+import PersetujuanKelas from "./PersetujuanKelas";
 
 const AdminRoutes = () => {
     return (
@@ -14,6 +16,8 @@ const AdminRoutes = () => {
           <Route path="daftar-pengajar" element={<DaftarPengajar />} />
           <Route path="riwayat-transaksi" element={<RiwayatTransaksi />} />
           <Route path="form-pengajar" element={<FormPengajar />} />
+          <Route path="list-peserta" element={<ListPeserta />} />
+          <Route path="persetujuan-buka-kelas" element={<PersetujuanKelas />} />
           
           {/* Tambahkan rute halaman lain di sini */}
         </Route>

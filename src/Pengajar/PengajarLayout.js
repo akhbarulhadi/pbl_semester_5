@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SidebarPengajar from "./SidebarPengajar";
-import Header from "./Header";
+import Header from "Admin/Header";
 import { Outlet } from "react-router-dom";
 
 function LayoutSidebar({ children }) {
