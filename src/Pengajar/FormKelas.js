@@ -18,6 +18,8 @@ const FormKelas = () => {
     preOrderOfflineDate: "",
   });
 
+  const [selectedFile, setSelectedFile] = useState(null);
+
     // Set nilai paid otomatis berdasarkan input harga (price)
   useEffect(() => {
     setFormData((prevFormData) => ({
@@ -75,30 +77,45 @@ const FormKelas = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const payload = {
-      ...formData,
-      modules: modules,
-    };
-    const confirm = window.confirm("Apakah anda yakin ingin memasukkan data nya!, Direkomendasikan untuk melihat ulang!");
+  
+    const payload = new FormData();
+    
+    // Tambahkan field ke FormData
+    Object.keys(formData).forEach((key) => {
+      payload.append(key, formData[key]);
+    });
+  
+    // Tambahkan file ke FormData
+    if (selectedFile) {
+      payload.append('file', selectedFile);
+    }
+  
+    modules.forEach((module, index) => {
+      payload.append(`modules[${index}][linkVideoYoutube]`, module.linkVideoYoutube);
+      payload.append(`modules[${index}][header]`, module.header);
+    });
+  
+    const confirm = window.confirm("Apakah anda yakin ingin memasukkan data nya?, Direkomendasikan untuk melihat ulang!");
     if (!confirm) return;
-
+  
     try {
       const response = await fetch("/api/pengajar/courses", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        // Hilangkan 'Content-Type' agar browser bisa secara otomatis menetapkan multipart/form-data
+        body: payload, 
       });
       const result = await response.json();
       if (response.ok) {
         alert("Course and modules added successfully");
-        localStorage.removeItem("formData");  // Clear localStorage after successful submission
+        localStorage.removeItem("formData");
         localStorage.removeItem("modules");
-        navigate('/pengajar/kelas');  // Redirect ke route '/pemasukan/list'
+        navigate('/pengajar/kelas');
       } else {
         alert(result.error);
       }
@@ -106,6 +123,7 @@ const FormKelas = () => {
       console.error("Error adding course and modules", error);
     }
   };
+  
 
   return (
     <form
@@ -150,6 +168,17 @@ const FormKelas = () => {
           onChange={handleInputChange}
           className="w-full border rounded-lg p-2"
         />
+      </div>
+      <div className="mb-6">
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Foto Kelas</label>
+        <input 
+        class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
+        aria-describedby="file_input_help"
+        onChange={handleFileChange}  // Tambahkan handler untuk file input
+        id="file_input" 
+        type="file" 
+        required />
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG or GIF (MAX. 800x400px).</p>
       </div>
       <div className="mb-6">
         <label className="block text-gray-500">Trailer Video</label>

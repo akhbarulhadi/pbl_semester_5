@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const useragent = require('express-useragent');
 const geoip = require('geoip-lite');
+const path = require('path');
 
 const authMiddleware = require('./middleware/authMiddleware');
 const authRouter = require('./routes/authRouter');
@@ -13,6 +14,9 @@ const transactionsRoutes = require('./routes/transactionsRoutes');
 
 const coursesPengajarRoutes = require('./routes/pengajar/coursesRoutes');
 const statistikAdminRoutes = require('./routes/admin/statistikRoutes');
+const coursesPenggunaRoutes = require('./routes/pengguna/coursesRoutes');
+const transactionsPenggunaRoutes = require('./routes/pengguna/transactionsRoutes');
+const coursesAdminRoutes = require('./routes/admin/coursesRoutes');
 
 
 const app = express();
@@ -32,7 +36,11 @@ app.use("/api/transactions", transactionsRoutes);
 
 app.use('/api/pengajar/courses', authMiddleware, coursesPengajarRoutes);
 app.use('/api/admin/statistik', authMiddleware, statistikAdminRoutes);
+app.use('/api/pengguna/courses', authMiddleware, coursesPenggunaRoutes);
+app.use('/api/pengguna/transactions', authMiddleware, transactionsPenggunaRoutes);
+app.use('/api/admin/courses', authMiddleware, coursesAdminRoutes);
 
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(useragent.express());
 

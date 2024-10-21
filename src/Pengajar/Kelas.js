@@ -81,9 +81,11 @@ const Kelas = () => {
           <thead>
             <tr className="bg-gray-200">
               <th className="py-2 px-4 border-b">Nama Kelas</th>
-              <th className="py-2 px-4 border-b">Berbayar</th>
+              <th className="py-2 px-4 border-b">Harga</th>
+              <th className="py-2 px-4 border-b">Format</th>
               <th className="py-2 px-4 border-b">Jumlah Pengikut</th>
               <th className="py-2 px-4 border-b">Status</th>
+              {/* <th className="py-2 px-4 border-b">Foto</th> */}
               <th className="py-2 px-4 border-b">Penyelesaian Siswa</th>
             </tr>
           </thead>
@@ -91,9 +93,26 @@ const Kelas = () => {
             {courses.map((course) => (
               <tr key={course.id_course} className="hover:bg-gray-100">
                 <td className="py-2 px-4 border-b">{course.course_title}</td>
-                <td className="py-2 px-4 border-b">{course.paid ? "Ya" : "Tidak"}</td>
+                <td className="py-2 px-4 border-b">{course.paid ? "Ya" : "Tidak"}{course.paid === false 
+                ? "Gratis" 
+                : course.price 
+                ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(course.price)
+                : ""}
+                </td>
+                <td className="py-2 px-4 border-b">{course.online ? "Online" : "Offline"}</td>
                 <td className="py-2 px-4 border-b">{course.joined_count}</td>
                 <td className="py-2 px-4 border-b">{course.status_course}</td>
+                {/* <td className="py-2 px-4 border-b">
+                {course.image_url ? (
+                <img 
+                    src={`/api/uploads/${course.image_url}`} // Ganti dengan URL yang benar
+                    alt={course.course_title} 
+                    style={{ width: '100px', height: 'auto' }} 
+                  />
+                ) : (
+                  <span>Tidak ada gambar</span> // Pesan jika gambar tidak tersedia
+                )}
+                </td> */}
                 <td className="py-2 px-4 border-b">
                   <div className="relative w-full">
                     <div className="flex items-center">

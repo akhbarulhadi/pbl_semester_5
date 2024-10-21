@@ -10,6 +10,10 @@ const useragent = require('express-useragent'); // Import express-useragent
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const upload = multer({ dest: 'uploads/' });
 
 // Gunakan middleware express-useragent
 router.use(useragent.express());
@@ -212,6 +216,83 @@ router.post('/register', async (req, res) => {
   });
 
   res.status(201).json({ message: 'Registrasi berhasil. Silakan cek email untuk verifikasi.' });
+});
+
+router.post('/add-teacher', upload.single('foto_pengajar'), async (req, res) => {
+  const { nama_pengajar, email, password, role } = req.body;
+  const foto_pengajar = req.file;
+
+  // Buat akun pengajar di auth Supabase
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  // Validasi jika file tidak ada
+  if (!foto_pengajar) {
+    return res.status(400).json({ error: 'Foto pengajar wajib diunggah' });
+  }
+  
+  // Upload file foto pengajar ke Supabase Storage
+  const fotoPath = foto_pengajar.path;
+  const fotoExt = path.extname(foto_pengajar.originalname);
+  const storagePath = `users_photos/${data.user.id}${fotoExt}`;
+
+  try {
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('users_photos') // Pastikan bucket storage 'users_photos' sudah dibuat di Supabase
+      .upload(storagePath, fs.createReadStream(fotoPath), {
+        contentType: foto_pengajar.mimetype,
+        cacheControl: '3600',
+      });
+
+    if (uploadError) {
+      fs.unlinkSync(fotoPath); // Hapus file sementara
+      return res.status(400).json({ error: uploadError.message });
+    }
+
+    // Mendapatkan URL foto yang diupload
+    const { data: publicURL } = supabase.storage
+      .from('users_photos')
+      .getPublicUrl(storagePath);
+
+    // Simpan data pengajar di tabel 'users'
+    const { error: insertError } = await supabase
+      .from('users')
+      .insert([{
+        id_user: data.user.id,
+        name: nama_pengajar,
+        role: role || 'Teacher', // Role default "teacher" jika tidak ada di body request
+        foto: publicURL.publicUrl, // Simpan URL foto
+        // created_at: new Date(),
+      }]);
+
+    if (insertError) {
+      fs.unlinkSync(fotoPath); // Hapus file sementara jika gagal insert
+      return res.status(400).json({ error: insertError.message });
+    }
+
+    // Hapus file sementara setelah upload berhasil
+    fs.unlinkSync(fotoPath);
+
+    // Berhasil menambahkan pengajar
+    return res.status(200).json({
+      message: 'Pengajar berhasil ditambahkan',
+      data: {
+        id_user: data.user.id,
+        name: nama_pengajar,
+        role: role || 'teacher',
+        foto: publicURL.publicUrl,
+      }
+    });
+  } catch (error) {
+    fs.unlinkSync(fotoPath); // Hapus file jika ada error yang tidak terduga
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // * Route untuk login

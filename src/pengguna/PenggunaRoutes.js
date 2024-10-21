@@ -36,9 +36,9 @@ const PenggunaRoutes = () => {
         <Route path="lihatkelas/:id" element={<LihatKelasDetail />} />
         <Route path="mulaikelas/:id" element={<MulaiKelas />} />
         <Route path="transaksi/:id" element={<DetailTransaksi />} />
-        <Route path="kursus/:id" element={<DetailKursus />} />
+        <Route path="kursus/:id_course" element={<DetailKursus />} />
         <Route path="semua-kursus" element={<SemuaKursus />} />
-        <Route path="/pembelian/:id" element={<Pembelian />} />
+        <Route path="/pembelian/:id_course" element={<Pembelian />} />
         <Route path="/detailpembelian/:id" element={<DetailPembelian />} />
       </Route>
     </Routes>

@@ -1,31 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBookOpen } from 'react-icons/fa';
 
 const KursusSaya = () => {
-  // Data dummy untuk kursus
-  const courses = [
-    {
-      id: 1,
-      title: 'Belajar React dari Dasar',
-      description: 'Pelajari dasar-dasar React dan bagaimana membangun aplikasi web interaktif.',
-      image: 'https://via.placeholder.com/400x200',
-      progress: 70,
-    },
-  ]; // Kosongkan untuk menunjukkan tidak ada kursus yang diikuti
+  const [courses, setCourses] = useState([]); // State to hold courses
+  const [searchTerm, setSearchTerm] = useState(''); // State for search term
 
-  // State untuk pencarian
-  const [searchTerm, setSearchTerm] = useState('');
+  // Fetch joined courses from the backend
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        let response = await fetch('/api/pengguna/courses', {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-  // Filter kursus berdasarkan pencarian
+        if (response.status === 401) {
+          // If token expired, refresh token
+          const refreshResponse = await fetch('/api/auth/refresh-token', {
+            method: 'POST',
+            credentials: 'include',
+          });
+
+          if (refreshResponse.ok) {
+            // Retry fetching courses after refreshing the token
+            response = await fetch('/api/pengguna/courses', {
+              method: 'GET',
+              credentials: 'include',
+            });
+          } else {
+            throw new Error('Refresh token failed');
+          }
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setCourses(data);
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  // Filter courses based on the search term
   const filteredCourses = courses.filter(course =>
-    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+    course.course_title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="container mx-auto p-3">
-        {/* Teks di atas */}
-        <div className="mb-8 ">
+        {/* Header Section */}
+        <div className="mb-8">
           <h1 className="text-2xl font-bold text-[#030712] mb-2">Kursus Saya</h1>
           <p className="text-lg text-[#3f3f46]">
             Upgrade terus ilmu dan pengalaman <br />
@@ -33,7 +63,7 @@ const KursusSaya = () => {
           </p>
         </div>
 
-        {/* Input untuk pencarian */}
+        {/* Search Input */}
         <div className="mb-4">
           <input
             type="text"
@@ -44,26 +74,33 @@ const KursusSaya = () => {
           />
         </div>
 
-        {/* Daftar kursus */}
+        {/* Courses List */}
         <div className="mt-8 mx-auto p-2">
           {filteredCourses.length > 0 ? (
             <ul className="space-y-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredCourses.map(course => (
-                <li key={course.id} className="bg-gray-200 shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
-                  <img src={course.image} alt={course.title} className="w-full h-32 rounded-lg mb-2 object-cover" />
-                  <Link to={`/pengguna/kursus/${course.id}`} className="flex-1">
+                <li key={course.id_course} className="bg-gray-200 shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
+                  <img src={course.image || 'https://via.placeholder.com/400x200'} alt={course.course_title} className="w-full h-32 rounded-lg mb-2 object-cover" />
+                  <Link to={`/pengguna/kursus/${course.id_course}`} className="flex-1">
                     <h3 className="text-xl font-semibold text-blue-600 mb-1 flex items-center">
                       <FaBookOpen className="mr-1" />
-                      {course.title}
+                      {course.course_title}
                     </h3>
-                    <p className="text-gray-600 mb-2 text-sm">{course.description}</p>
-                    <div className="relative bg-gray-200 rounded-full h-2 mb-1 overflow-hidden">
-                      <div
-                        className="absolute top-0 left-0 h-full bg-blue-500 rounded-full transition-all duration-500"
-                        style={{ width: `${course.progress}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-xs text-gray-500">{course.progress}% selesai</span>
+                    <p className="text-gray-600 mb-2 text-sm">{course.course_description}</p>
+                    <p className="text-gray-600 mb-2 text-sm">{course.online ? "Online" : "Offline"}</p>
+                    
+                    {/* Hanya tampilkan progress jika kursus online */}
+                    {course.online && (
+                      <>
+                        <div className="relative bg-gray-200 rounded-full h-2 mb-1 overflow-hidden">
+                          <div
+                            className="absolute top-0 left-0 h-full bg-blue-500 rounded-full transition-all duration-500"
+                            style={{ width: `${course.progress || 0}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-xs text-gray-500">{course.progress || 0}% selesai</span>
+                      </>
+                    )}
                   </Link>
                 </li>
               ))}
@@ -80,7 +117,7 @@ const KursusSaya = () => {
           )}
         </div>
 
-        {/* Tombol navigasi tambahan */}
+        {/* Additional Navigation Button */}
         <div className="mt-4 text-center">
           <Link to="/pengguna/semua-kursus">
             <button className="px-4 py-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105">

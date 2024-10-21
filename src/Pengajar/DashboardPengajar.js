@@ -183,7 +183,8 @@ const DashboardPengajar = () => {
           <thead>
             <tr className="bg-gray-200">
               <th className="py-2 px-4 border-b">Nama Kelas</th>
-              <th className="py-2 px-4 border-b">Berbayar</th>
+              <th className="py-2 px-4 border-b">Harga</th>
+              <th className="py-2 px-4 border-b">Format</th>
               <th className="py-2 px-4 border-b">Jumlah Pengikut</th>
               <th className="py-2 px-4 border-b">Status</th>
               <th className="py-2 px-4 border-b">Penyelesaian Siswa</th>
@@ -197,7 +198,13 @@ const DashboardPengajar = () => {
                     {course.course_title}
                   </Link>
                 </td>
-                <td className="py-2 px-4 border-b">{course.paid ? "Ya" : "Tidak"}</td>
+                <td className="py-2 px-4 border-b">{course.paid === false 
+                ? "Gratis" 
+                : course.price 
+                ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(course.price)
+                : ""}
+                </td>
+                <td className="py-2 px-4 border-b">{course.online ? "Online" : "Offline"}</td>
                 <td className="py-2 px-4 border-b">{course.joined_count}</td>
                 <td className="py-2 px-4 border-b">{course.status_course}</td>
                 <td className="py-2 px-4 border-b">
