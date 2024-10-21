@@ -7,6 +7,7 @@ import FormPengajar from "./FormPengajar";
 import ListPeserta from "./ListPeserta";
 import PersetujuanKelas from "./PersetujuanKelas";
 import DetailKelas from "Pengajar/DetailKelas";
+import PersetujuanPenarikan from "./PersetujuanPenarikan";
 
 const AdminRoutes = () => {
     return (
@@ -20,6 +21,7 @@ const AdminRoutes = () => {
           <Route path="list-peserta" element={<ListPeserta />} />
           <Route path="persetujuan-buka-kelas" element={<PersetujuanKelas />} />
           <Route path="detail-kelas/:id_course" element={<DetailKelas />} />
+          <Route path="persetujuan-penarikan" element={<PersetujuanPenarikan />} />
           
           {/* Tambahkan rute halaman lain di sini */}
         </Route>

@@ -6,7 +6,7 @@ const AdminLayout = () => {
   return (
     <div className="flex overflow-x-auto">
         {/* Header */}
-        <Header/>
+        <Header />
 
         {/* Konten */}
         <main className="flex-1 overflow-y-auto p-8 bg-white mt-16 lg:ml-64">

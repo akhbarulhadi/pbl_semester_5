@@ -121,6 +121,15 @@ const Header = () => {
             </li>
             <li>
               <Link 
+                to="/admin/persetujuan-penarikan" 
+                className={`flex items-center p-4 rounded-lg transition-all duration-300 ${location.pathname === '/admin/persetujuan-penarikan' ? 'bg-gray-600' : 'hover:bg-gray-600'}`} 
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className="ml-3 flex-1">Persetujuan Penarikan Duit</span>
+              </Link>
+            </li>
+            <li>
+              <Link 
                 to="/admin/riwayat-transaksi" 
                 className={`flex items-center p-4 rounded-lg transition-all duration-300 ${location.pathname === '/admin/riwayat-transaksi' ? 'bg-gray-600' : 'hover:bg-gray-600'}`} 
                 onClick={() => setIsMobileMenuOpen(false)}
