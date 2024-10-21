@@ -93,7 +93,7 @@ const Kelas = () => {
             {courses.map((course) => (
               <tr key={course.id_course} className="hover:bg-gray-100">
                 <td className="py-2 px-4 border-b">{course.course_title}</td>
-                <td className="py-2 px-4 border-b">{course.paid ? "Ya" : "Tidak"}{course.paid === false 
+                <td className="py-2 px-4 border-b">{course.paid === false 
                 ? "Gratis" 
                 : course.price 
                 ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(course.price)

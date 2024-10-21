@@ -58,14 +58,14 @@ const authMiddleware = (req, res, next) => {
       // email: 'grilong66@gmail.com',
       // name: 'grilong',
       // role: 'Student'
-      id: '5bfa3e67-888f-4a5e-8dc3-03cfa4763b60',
-      email: 'admin1@gmail.com',
-      name: 'admin1',
-      role: 'Admin'
-      // id: 'a0570ba0-1d2c-493b-96c6-3a61e252160f',
-      // email: 'guru1@gmail.com',
-      // name: 'guru1',
-      // role: 'Teacher'
+      // id: '5bfa3e67-888f-4a5e-8dc3-03cfa4763b60',
+      // email: 'admin1@gmail.com',
+      // name: 'admin1',
+      // role: 'Admin'
+      id: 'a0570ba0-1d2c-493b-96c6-3a61e252160f',
+      email: 'guru1@gmail.com',
+      name: 'guru1',
+      role: 'Teacher'
     };
     return next();
   }

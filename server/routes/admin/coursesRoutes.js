@@ -126,6 +126,49 @@ router.get('/list-transactions', async (req, res) => {
 });
 
 
+router.get('/:id_course', async (req, res) => {
+  const { id_course } = req.params;
+
+  try {
+    const { data: courseData, error: courseError } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('id_course', id_course)
+      .single();
+
+    if (courseError) {
+      console.error('Error fetching course:', courseError);
+      return res.status(400).json({ error: 'Error fetching course' });
+    }
+
+    if (!courseData) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    const { data: modulesData, error: modulesError } = await supabase
+      .from('modules')
+      .select('*')
+      .eq('id_courses', id_course);
+
+    if (modulesError) {
+      console.error('Error fetching modules:', modulesError);
+      return res.status(400).json({ error: 'Error fetching modules' });
+    }
+
+    const responseData = {
+      course: courseData,
+      modules: modulesData
+    };
+
+    console.log('Fetched course and modules data:', responseData);
+
+    res.status(200).json(responseData);
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 
 module.exports = router;

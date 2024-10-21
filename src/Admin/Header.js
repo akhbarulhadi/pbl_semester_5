@@ -89,6 +89,49 @@ const Header = () => {
         </div>
       </nav>
 
+      <aside className={`fixed left-0 z-40 w-64 mt-16 h-full bg-gray-700 shadow-lg border-r border-gray-600 transition-transform transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 mobile-menu`}>
+        <div className="h-full px-4 py-6">
+          <ul className="space-y-4 font-medium text-gray-200">
+            <li>
+              <Link 
+                to="/admin/dashboard-admin" 
+                className={`flex items-center p-4 rounded-lg transition-all duration-300 ${location.pathname === '/admin/dashboard-admin' ? 'bg-gray-600' : 'hover:bg-gray-600'}`} 
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className="ml-3">Dashboard</span>
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/admin/daftar-pengajar" 
+                className={`flex items-center p-4 rounded-lg transition-all duration-300 ${location.pathname === '/admin/daftar-pengajar' ? 'bg-gray-600' : 'hover:bg-gray-600'}`} 
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className="flex-1 ml-3">Daftar Pengajar</span>
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/admin/persetujuan-buka-kelas" 
+                className={`flex items-center p-4 rounded-lg transition-all duration-300 ${location.pathname === '/admin/persetujuan-buka-kelas' ? 'bg-gray-600' : 'hover:bg-gray-600'}`} 
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className="ml-3 flex-1">Persetujuan Buka Kelas</span>
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/admin/riwayat-transaksi" 
+                className={`flex items-center p-4 rounded-lg transition-all duration-300 ${location.pathname === '/admin/riwayat-transaksi' ? 'bg-gray-600' : 'hover:bg-gray-600'}`} 
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className="ml-3 flex-1">Riwayat Transaksi</span>
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
       {/* Overlay untuk mobile menu */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-30 bg-black opacity-50 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />

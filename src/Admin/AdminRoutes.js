@@ -6,6 +6,7 @@ import RiwayatTransaksi from "./RiwayatTransaksi";
 import FormPengajar from "./FormPengajar";
 import ListPeserta from "./ListPeserta";
 import PersetujuanKelas from "./PersetujuanKelas";
+import DetailKelas from "Pengajar/DetailKelas";
 
 const AdminRoutes = () => {
     return (
@@ -18,6 +19,7 @@ const AdminRoutes = () => {
           <Route path="form-pengajar" element={<FormPengajar />} />
           <Route path="list-peserta" element={<ListPeserta />} />
           <Route path="persetujuan-buka-kelas" element={<PersetujuanKelas />} />
+          <Route path="detail-kelas/:id_course" element={<DetailKelas />} />
           
           {/* Tambahkan rute halaman lain di sini */}
         </Route>

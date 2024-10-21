@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 
 // const dataKelas = [
 //   {
@@ -139,7 +141,11 @@ const PersetujuanKelas = () => {
           {courses.map((course) => (
             <tr key={course.id_course} className="hover:bg-gray-100">
               <td className="py-2 px-4 border-b">{course.user_name}</td>
-              <td className="py-2 px-4 border-b">{course.course_title}</td>
+              <td className="py-2 px-4 border-b">
+                <Link to={`/admin/detail-kelas/${course.id_course}`} className="text-blue-500 hover:underline">
+                  {course.course_title}
+                </Link>
+              </td>
               <td className="py-2 px-4 border-b">{course.course_description}</td>
               <td className="py-2 px-4 border-b">{course.online ? "Online" : "Offline"}</td>
               <td className="py-2 px-4 border-b text-center">{course.paid === false 
