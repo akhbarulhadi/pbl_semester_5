@@ -40,7 +40,7 @@ app.use("/api/transactions", transactionsRoutes);
 app.use('/api/pengajar/courses', authMiddleware, coursesPengajarRoutes);
 app.use('/api/admin/statistik', authMiddleware, statistikAdminRoutes);
 app.use('/api/pengguna/courses', authMiddleware, coursesPenggunaRoutes);
-app.use('/api/pengguna/transactions', authMiddleware, transactionsPenggunaRoutes);
+app.use('/api/pengguna/transactions', transactionsPenggunaRoutes);
 app.use('/api/admin/courses', authMiddleware, coursesAdminRoutes);
 app.use('/api/admin/teacher', authMiddleware, teacherAdminRoutes);
 app.use('/api/admin/signup-teacher', signupTeachersAdminRoutes);

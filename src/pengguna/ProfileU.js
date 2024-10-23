@@ -60,8 +60,8 @@ const ProfileU = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <section className="relative mt-20 bg-gradient-to-r from-blue-50 to-white w-full py-12">
-      <div className="container md:ml-72 mx-auto p-6">
+    <section className="relative w-full py-12">
+      <div className="container mx-auto p-6">
         <h1 className="text-4xl font-bold mb-6 text-gray-800">Profil Saya</h1>
 
         {/* Profile Card */}
