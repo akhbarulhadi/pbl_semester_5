@@ -54,18 +54,18 @@ const authMiddleware = (req, res, next) => {
   // Bypass token jika dalam mode development
   if (process.env.NODE_ENV === 'development') {
     req.user = {
-      // id: '53d151f8-bf87-45b4-b80f-70f65d8338d5',
-      // email: 'grilong66@gmail.com',
-      // name: 'grilong',
-      // role: 'Student'
+      id: '53d151f8-bf87-45b4-b80f-70f65d8338d5',
+      email: 'grilong66@gmail.com',
+      name: 'grilong',
+      role: 'Student'
       // id: '5bfa3e67-888f-4a5e-8dc3-03cfa4763b60',
       // email: 'admin1@gmail.com',
       // name: 'admin1',
       // role: 'Admin'
-      id: 'a0570ba0-1d2c-493b-96c6-3a61e252160f',
-      email: 'guru1@gmail.com',
-      name: 'guru1',
-      role: 'Teacher'
+      // id: 'a0570ba0-1d2c-493b-96c6-3a61e252160f',
+      // email: 'guru1@gmail.com',
+      // name: 'guru1',
+      // role: 'Teacher'
     };
     return next();
   }

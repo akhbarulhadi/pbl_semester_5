@@ -99,7 +99,7 @@ const RiwayatTransaksi = () => {
                    transaction.payment_status === 'pending' ? 'Tertunda' : 'Gagal'}
                 </td>
                 <td className="py-2 px-4 border-b border-gray-300">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transaction.price)}</td>
-                <td className="py-2 px-4 border-b border-gray-300">{new Date(transaction.payment_date).toLocaleDateString()}</td>
+                <td className="py-2 px-4 border-b border-gray-300">{transaction.payment_date ? new Date(transaction.payment_date).toLocaleDateString() : 'Tanggal tidak tersedia'}</td>
                 <td className="py-2 px-4 border-b border-gray-300">{new Date(transaction.created_at).toLocaleDateString()}</td>
               </tr>
             ))}

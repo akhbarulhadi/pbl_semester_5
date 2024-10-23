@@ -92,7 +92,11 @@ const Kelas = () => {
           <tbody className="text-center">
             {courses.map((course) => (
               <tr key={course.id_course} className="hover:bg-gray-100">
-                <td className="py-2 px-4 border-b">{course.course_title}</td>
+                <td className="py-2 px-4 border-b">
+                <Link to={`/pengajar/detail-kelas/${course.id_course}`} className="text-blue-500 hover:underline">
+                    {course.course_title}
+                  </Link>
+                </td>
                 <td className="py-2 px-4 border-b">{course.paid === false 
                 ? "Gratis" 
                 : course.price 

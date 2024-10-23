@@ -84,37 +84,41 @@ const FormKelas = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    const payload = new FormData();
+    const formDataToSend = new FormData();  // Membuat objek FormData untuk multipart
+    formDataToSend.append('courseTitle', formData.courseTitle);
+    formDataToSend.append('courseDescription', formData.courseDescription);
+    formDataToSend.append('price', formData.price);
+    formDataToSend.append('paid', formData.paid);
+    formDataToSend.append('trailerVideoYoutube', formData.trailerVideoYoutube);
+    formDataToSend.append('statusCourse', formData.statusCourse);
+    formDataToSend.append('online', formData.online);
+    formDataToSend.append('benefit', formData.benefit);
+    formDataToSend.append('locationOffline', formData.locationOffline);
+    formDataToSend.append('preOrderOfflineDate', formData.preOrderOfflineDate);
     
-    // Tambahkan field ke FormData
-    Object.keys(formData).forEach((key) => {
-      payload.append(key, formData[key]);
-    });
-  
-    // Tambahkan file ke FormData
     if (selectedFile) {
-      payload.append('file', selectedFile);
+      formDataToSend.append('file', selectedFile);  // Menambahkan file foto
     }
   
-    modules.forEach((module, index) => {
-      payload.append(`modules[${index}][linkVideoYoutube]`, module.linkVideoYoutube);
-      payload.append(`modules[${index}][header]`, module.header);
-    });
+    // Menambahkan modul jika ada
+    if (modules.length > 0) {
+      formDataToSend.append('modules', JSON.stringify(modules));
+    }
   
-    const confirm = window.confirm("Apakah anda yakin ingin memasukkan data nya?, Direkomendasikan untuk melihat ulang!");
+    const confirm = window.confirm("Apakah anda yakin ingin memasukkan data nya!, Direkomendasikan untuk melihat ulang!");
     if (!confirm) return;
   
     try {
       const response = await fetch("/api/pengajar/courses", {
         method: "POST",
-        // Hilangkan 'Content-Type' agar browser bisa secara otomatis menetapkan multipart/form-data
-        body: payload, 
+        body: formDataToSend,  // Mengirim FormData
       });
       const result = await response.json();
       if (response.ok) {
-        alert("Course and modules added successfully");
+        alert("Berhasil!");
         localStorage.removeItem("formData");
         localStorage.removeItem("modules");
+        localStorage.removeItem("isOn");
         navigate('/pengajar/kelas');
       } else {
         alert(result.error);
@@ -236,6 +240,7 @@ const FormKelas = () => {
             onChange={handleInputChange}
             placeholder="Enter the location of the offline class"
             className="w-full border rounded-lg p-2"
+            required
           />
       </div>
       </>

@@ -1,18 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 
 const FormPengajar = () => {
+  const [namaPengajar, setNamaPengajar] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('Teacher');
+  const [noTelepon, setNoTelepon] = useState('');
+  const [fotoPengajar, setFotoPengajar] = useState(null); // Tambahkan state untuk file foto
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    setError('');
+
+    // Buat objek FormData untuk menampung data dan file
+    const formData = new FormData();
+    formData.append('nama_pengajar', namaPengajar);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('role', role);
+    formData.append('no_telepon_pengajar', noTelepon);
+    formData.append('foto_pengajar', fotoPengajar); // Tambahkan file foto
+
+    try {
+      const response = await fetch('/api/admin/signup-teacher/add-teacher', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Terjadi kesalahan saat menambahkan pengajar');
+      }
+
+      setMessage(data.message);
+      setNamaPengajar('');
+      setEmail('');
+      setPassword('');
+      setRole('Teacher');
+      setNoTelepon('');
+      setFotoPengajar(null); // Reset state foto
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
-    <form className="max-w-2xl mx-auto relative z-10 mt-20 p-6 border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800">
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-2xl mx-auto relative z-10 mt-20 p-6 border border-gray-300 rounded-lg shadow-lg bg-white dark:bg-gray-800"
+    >
       <p className="text-4xl text-gray-900 font-extralight dark:text-white">
         Form Tambah Pengajar
       </p>
 
-      {/* Input for Class Name */}
+      {/* Input for Name */}
       <div className="relative z-0 w-full mb-6 group">
         <input
           type="text"
-          name="nama_pengajar"
-          id="nama_pengajar"
+          value={namaPengajar}
+          onChange={(e) => setNamaPengajar(e.target.value)}
           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-lg dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           placeholder=" "
           required
@@ -24,11 +74,13 @@ const FormPengajar = () => {
           Nama Lengkap Pengajar
         </label>
       </div>
+
+      {/* Input for Email */}
       <div className="relative z-0 w-full mb-6 group">
         <input
           type="email"
-          name="email_pengajar"
-          id="email_pengajar"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-lg dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           placeholder=" "
           required
@@ -41,11 +93,12 @@ const FormPengajar = () => {
         </label>
       </div>
 
+      {/* Input for Password */}
       <div className="relative z-0 w-full mb-6 group">
         <input
           type="password"
-          name="password"
-          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-lg dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           placeholder=" "
           minLength={12}
@@ -58,11 +111,13 @@ const FormPengajar = () => {
           Password
         </label>
       </div>
+
+      {/* Input for Phone Number */}
       <div className="relative z-0 w-full mb-6 group">
         <input
           type="text"
-          name="no_telepon_pengajar"
-          id="no_telepon_pengajar"
+          value={noTelepon}
+          onChange={(e) => setNoTelepon(e.target.value)}
           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border border-gray-300 rounded-lg dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           placeholder=" "
           required
@@ -87,7 +142,7 @@ const FormPengajar = () => {
           aria-describedby="file_input_help"
           id="file_input"
           type="file"
-          required
+          onChange={(e) => setFotoPengajar(e.target.files[0])}
         />
         <p
           class="mt-1 text-sm text-gray-500 dark:text-gray-300"
@@ -104,6 +159,9 @@ const FormPengajar = () => {
       >
         Submit
       </button>
+
+      {message && <p className="mt-4 text-green-600">{message}</p>}
+      {error && <p className="mt-4 text-red-600">{error}</p>}
     </form>
   );
 };

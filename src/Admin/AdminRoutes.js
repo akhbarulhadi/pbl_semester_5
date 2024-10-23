@@ -6,7 +6,7 @@ import RiwayatTransaksi from "./RiwayatTransaksi";
 import FormPengajar from "./FormPengajar";
 import ListPeserta from "./ListPeserta";
 import PersetujuanKelas from "./PersetujuanKelas";
-import DetailKelas from "Pengajar/DetailKelas";
+import DetailKelas from "Admin/DetailKelas";
 import PersetujuanPenarikan from "./PersetujuanPenarikan";
 
 const AdminRoutes = () => {

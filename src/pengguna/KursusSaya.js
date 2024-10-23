@@ -80,7 +80,7 @@ const KursusSaya = () => {
             <ul className="space-y-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredCourses.map(course => (
                 <li key={course.id_course} className="bg-gray-200 shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
-                  <img src={course.image || 'https://via.placeholder.com/400x200'} alt={course.course_title} className="w-full h-32 rounded-lg mb-2 object-cover" />
+                  <img src={`/api/${course.image_url}` || 'https://via.placeholder.com/400x200'} alt={course.course_title} className="w-full h-32 rounded-lg mb-2 object-cover" />
                   <Link to={`/pengguna/kursus/${course.id_course}`} className="flex-1">
                     <h3 className="text-xl font-semibold text-blue-600 mb-1 flex items-center">
                       <FaBookOpen className="mr-1" />

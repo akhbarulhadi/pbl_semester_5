@@ -31,6 +31,21 @@ const Header = () => {
     setIsProfileMenuOpen(false);
   }, [location.pathname]);
 
+  const handleLogout = () => {
+    fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include', // Jika token disimpan di HttpOnly cookie
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Logout failed. Status: ${response.status}`);
+        }
+        // Lakukan aksi logout di frontend, misalnya redirect ke halaman login
+        window.location.href = '/';
+      })
+      .catch((error) => console.error('Logout error:', error));
+  }; 
+
   return (
     <>
       {/* Navbar */}
@@ -78,9 +93,9 @@ const Header = () => {
                 </Link>
 
                 <Link 
-                  to="/#" 
+                  // to="/#" 
                   className="block px-4 py-2 text-gray-300 hover:bg-gray-700"
-                  onClick={() => setIsProfileMenuOpen(false)}>
+                  onClick={handleLogout}>
                   Keluar
                 </Link>
               </div>

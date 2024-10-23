@@ -17,7 +17,10 @@ const statistikAdminRoutes = require('./routes/admin/statistikRoutes');
 const coursesPenggunaRoutes = require('./routes/pengguna/coursesRoutes');
 const transactionsPenggunaRoutes = require('./routes/pengguna/transactionsRoutes');
 const coursesAdminRoutes = require('./routes/admin/coursesRoutes');
-
+const teacherAdminRoutes = require('./routes/admin/teacherRoutes');
+const signupTeachersAdminRoutes = require('./routes/admin/signupTeachersRoutes');
+const teacherWithdrawalRoutes = require('./routes/pengajar/withdrawRoutes');
+const adminWithdrawalRoutes = require('./routes/admin/withdrawRoutes');
 
 const app = express();
 const fs = require('fs');
@@ -39,8 +42,13 @@ app.use('/api/admin/statistik', authMiddleware, statistikAdminRoutes);
 app.use('/api/pengguna/courses', authMiddleware, coursesPenggunaRoutes);
 app.use('/api/pengguna/transactions', authMiddleware, transactionsPenggunaRoutes);
 app.use('/api/admin/courses', authMiddleware, coursesAdminRoutes);
+app.use('/api/admin/teacher', authMiddleware, teacherAdminRoutes);
+app.use('/api/admin/signup-teacher', signupTeachersAdminRoutes);
+app.use('/api/pengajar/withdrawal', authMiddleware, teacherWithdrawalRoutes);
+app.use('/api/admin/withdrawal', authMiddleware, adminWithdrawalRoutes);
 
-app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/uploads/kelas', express.static(path.join(__dirname, 'uploads/kelas')));
+app.use('/api/uploads/user', express.static(path.join(__dirname, 'uploads/user')));
 
 app.use(useragent.express());
 

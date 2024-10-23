@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const ProfileU = () => {
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const user = {
     name: 'John Doe',
     email: 'johndoe@example.com',
@@ -28,6 +32,33 @@ const ProfileU = () => {
     ],
   };
 
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch('/api/auth/profile', {
+          method: 'GET',
+          credentials: 'include', // penting jika menggunakan cookie untuk autentikasi
+        });
+
+        if (!response.ok) {
+          throw new Error('Error: ' + response.statusText);
+        }
+
+        const data = await response.json();
+        setProfileData(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <section className="relative mt-20 bg-gradient-to-r from-blue-50 to-white w-full py-12">
       <div className="container md:ml-72 mx-auto p-6">
@@ -38,25 +69,25 @@ const ProfileU = () => {
           {/* Foto Profil */}
           <div className="mb-4 md:mb-0">
             <img
-              src={user.profilePicture}
-              alt="Profile"
+              src={profileData.foto}
+              alt={`${profileData.name}'s profile`}
               className="w-40 h-40 rounded-full object-cover shadow-lg border-4 border-blue-200"
             />
           </div>
           {/* Detail Profil */}
           <div className="text-center md:text-left">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">{user.name}</h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">{profileData.name}</h2>
             <p className="text-gray-600">
-              <strong>Email:</strong> {user.email}
+              <strong>Email:</strong> {profileData.email}
             </p>
             <p className="text-gray-600">
-              <strong>Nomor HP:</strong> {user.phone}
+              <strong>Nomor HP:</strong> {profileData.no_telp ? profileData.no_telp : '---'}
             </p>
             <p className="text-gray-600">
-              <strong>Alamat:</strong> {user.address}
+              <strong>Terakhir login:</strong> {new Date(profileData.last_sign_in_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
             </p>
             <p className="text-gray-600 mb-4">
-              <strong>Bio:</strong> {user.bio}
+              <strong>Dibuat:</strong> {new Date(profileData.created_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}
             </p>
 
             {/* Media Sosial */}

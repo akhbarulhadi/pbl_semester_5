@@ -5,6 +5,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(''); // State baru untuk pesan sukses
   const navigate = useNavigate(); 
 
   const handleLogin = async (e) => {
@@ -23,15 +24,36 @@ const Login = () => {
       if (!response.ok) {
         const { error } = await response.json();
         setError(error);
+        setSuccess(''); // Hapus pesan sukses jika ada error
         return;
       }
-      // Redirect ke halaman lain, misalnya ke halaman dashboard
-      navigate('/dashboard');
+
+      // Dapatkan data pengguna dan peran
+      const { role, message } = await response.json();
+
+      // Set success message
+      setSuccess(message); // Atur pesan sukses
+      setError(''); // Hapus pesan error jika login berhasil
+
+      // Redirect berdasarkan role
+      if (role === 'Admin') {
+        navigate('/admin/dashboard-admin'); // Ganti dengan path dashboard admin
+      } else if (role === 'Teacher') {
+        navigate('/pengajar/dashboard-pengajar'); // Ganti dengan path dashboard teacher
+      } else if (role === 'Student') {
+        navigate('/pengguna/dashboardU'); // Ganti dengan path dashboard student
+      } else {
+        setError('Role tidak dikenali.');
+        setSuccess('');
+      }
+
     } catch (error) {
       setError('Terjadi kesalahan. Silakan coba lagi.');
+      setSuccess(''); // Hapus pesan sukses jika ada error
       console.error(error);
     }
   };
+
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -40,6 +62,21 @@ const Login = () => {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white text-center">
               Login
             </h1>
+
+            {/* Alert sukses */}
+            {success && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span className="block sm:inline">{success}</span>
+              </div>
+            )}
+
+            {/* Alert error */}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
+
             <form className="space-y-4 md:space-y-6" onSubmit={handleLogin}>
               <div>
                 <label

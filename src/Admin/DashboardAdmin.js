@@ -1,8 +1,9 @@
 // src/pengajar/DashboardPengajar.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import StatistikData from "./StatistikData";
 import DataIncome from "Pengajar/DataIncome";
+import { useNavigate } from 'react-router-dom';
 
 const listPengguna = [
   {
@@ -24,6 +25,28 @@ const listPengguna = [
 ];
 
 const DashboardAdmin = () => {
+  const [totalUser, setTotalUser] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch('/api/admin/teacher/count', {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          // navigate('/login');
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        setTotalUser(data.userCount);
+      })
+      .catch((error) => console.error('Fetch error:', error));
+  }, []);
+
   return (
     <>
       <div class="grid grid-cols-3 gap-2">
@@ -38,8 +61,8 @@ const DashboardAdmin = () => {
             <Link to="/admin/list-peserta" className="block">
               <DataIncome
                 title="Total Peserta"
-                total="400"
-                levelUp
+                total={totalUser}
+                // levelUp
               >
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                   <path fill-rule="evenodd" d="M12 6a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm-1.5 8a4 4 0 0 0-4 4 2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-3Zm6.82-3.096a5.51 5.51 0 0 0-2.797-6.293 3.5 3.5 0 1 1 2.796 6.292ZM19.5 18h.5a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-1.1a5.503 5.503 0 0 1-.471.762A5.998 5.998 0 0 1 19.5 18ZM4 7.5a3.5 3.5 0 0 1 5.477-2.889 5.5 5.5 0 0 0-2.796 6.293A3.501 3.501 0 0 1 4 7.5ZM7.1 12H6a4 4 0 0 0-4 4 2 2 0 0 0 2 2h.5a5.998 5.998 0 0 1 3.071-5.238A5.505 5.505 0 0 1 7.1 12Z" clip-rule="evenodd"/>

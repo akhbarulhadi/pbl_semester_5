@@ -120,7 +120,7 @@ const SemuaKursus = () => {
                       to={course.joined_users.length === 0 ? `/pengguna/Pembelian/${course.id_course}` : `/pengguna/kursus/${course.id_course}`} 
                       className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-300 block" // Use 'block' to make the link cover the entire card
                     >
-                    <img src={`/api/uploads/${course.image_url}`} alt={course.course_title} className="w-full h-48 object-cover rounded-lg mb-4" />
+                    <img src={`/api/${course.image_url}`} alt={course.course_title} className="w-full h-48 object-cover rounded-lg mb-4" />
                     <h2 className="text-2xl font-semibold mb-2">{course.course_title}</h2>
                     <p className="text-gray-700 mb-4">{course.description}</p>
                     <p className="text-gray-500 mb-2">{course.paid === false 

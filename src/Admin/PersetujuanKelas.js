@@ -178,7 +178,7 @@ const PersetujuanKelas = () => {
                       onClick={() => handleAction(course, 'Deactivate')}
                       className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-gray-200 rounded-lg hover:bg-red-700"
                     >
-                      Deactivate
+                      Non aktif
                     </button>
                   )}
                   {course.status_course === "Deactivate" && (
@@ -186,7 +186,7 @@ const PersetujuanKelas = () => {
                       onClick={() => handleAction(course, 'Pending')}
                       className="px-4 py-2 text-sm font-medium text-white bg-yellow-600 border border-gray-200 rounded-lg hover:bg-yellow-700"
                     >
-                      Set Ke Pending
+                      Atur Ke Pending
                     </button>
                   )}
                 </div>

@@ -358,7 +358,18 @@ router.get('/count', async (req, res) => {
 
       const totalUniqueJoinedUsers = uniqueUserIds.size;
 
-      res.json({ id_user, total_courses: totalCourses, total_joined_users: totalJoinedUsers, total_unique_joined_users: totalUniqueJoinedUsers });
+      const { data: teacherBalance, error: teacherBalanceError } = await supabase
+      .from('teacher_balance')
+      .select('balance')
+      .eq('id_user_teacher', id_user);
+
+      if (teacherBalanceError) {
+          return res.status(400).json({ error: teacherBalanceError.message });
+      }
+    
+      const Balance = teacherBalance;
+
+      res.json({ id_user, total_courses: totalCourses, total_joined_users: totalJoinedUsers, total_unique_joined_users: totalUniqueJoinedUsers, balance: Balance });
   } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -467,7 +478,7 @@ router.get('/:id_course', async (req, res) => {
 // ! Konfigurasi Multer untuk penyimpanan file
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, 'uploads/kelas/');
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -479,7 +490,20 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/', upload.single('file'), async (req, res) => {
-  const { courseTitle, courseDescription, price, paid, trailerVideoYoutube, statusCourse, online, modules, benefit, locationOffline, preOrderOfflineDate } = req.body;
+  const { 
+    courseTitle, 
+    courseDescription, 
+    price, 
+    paid, 
+    trailerVideoYoutube, 
+    statusCourse, 
+    online, 
+    modules, 
+    benefit, 
+    locationOffline, 
+    preOrderOfflineDate 
+  } = req.body;
+
   const idUser = req.user.id;
 
   console.log('Payload received:', req.body);
@@ -491,30 +515,26 @@ router.post('/', upload.single('file'), async (req, res) => {
 
   const finalPrice = price === "" ? null : price;
   const finalPO = preOrderOfflineDate === "" ? null : preOrderOfflineDate;
-  const imageUrl = req.file ? `/${req.file.filename}` : null;  // ! Jika ada file, ambil URL nya
-
+  const imageUrl = req.file ? `/uploads/kelas/${req.file.filename}` : null; 
 
   try {
     // Insert new course
     const { data: courseData, error: courseError } = await supabase
       .from('courses')
-      .insert([
-        {
-          course_title: courseTitle,
-          course_description: courseDescription,
-          price: finalPrice,
-          paid: paid,
-          id_user: idUser,
-          trailer_video_youtube: trailerVideoYoutube,
-          status_course: statusCourse,
-          online: online,
-          benefit: benefit,
-          location_offline: locationOffline,
-          preorder_offline_date: finalPO,
-          image_url: imageUrl,
-          
-        }
-      ])
+      .insert([{
+        course_title: courseTitle,
+        course_description: courseDescription,
+        price: finalPrice,
+        paid: paid,
+        id_user: idUser,
+        trailer_video_youtube: trailerVideoYoutube,
+        status_course: statusCourse,
+        online: online,
+        benefit: benefit,
+        location_offline: locationOffline,
+        preorder_offline_date: finalPO,
+        image_url: imageUrl,
+      }])
       .select('id_course');
 
     if (courseError) {
@@ -522,8 +542,7 @@ router.post('/', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'Error inserting course' });
     }
 
-    // Log untuk memastikan course berhasil di-insert
-    // console.log('Inserted course data:', courseData);
+    console.log('Inserted course data:', courseData);
 
     if (!courseData || courseData.length === 0) {
       return res.status(400).json({ error: 'No course data returned from Supabase' });
@@ -531,24 +550,37 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     const courseId = courseData[0].id_course;
 
+    if (online === 'true') {  // Pastikan untuk membandingkan dengan string 'true'
+      // Mengonversi modules dari string JSON ke objek
+      let modulesData = [];
+      if (modules) {
+        try {
+          modulesData = JSON.parse(modules);
+          console.log('Parsed modules data:', modulesData); // Log data modules
+        } catch (parseError) {
+          console.error('Error parsing modules JSON:', parseError);
+          return res.status(400).json({ error: 'Invalid modules format' });
+        }
+      }
 
-    if (online === true) {
+      // Siapkan data untuk di-insert
+      const modulesToInsert = modulesData.map(module => ({
+        id_courses: courseId, // ID kursus yang baru saja dibuat
+        link_video_youtube: module.linkVideoYoutube, // Pastikan ini sesuai dengan key dalam JSON
+        header: module.header
+      }));
 
-    const modulesData = modules.map(module => ({
-      id_courses: courseId,
-      link_video_youtube: module.linkVideoYoutube,
-      header: module.header
-    }));
+      console.log('Modules data to insert:', modulesToInsert); // Log data yang akan di-insert
 
-    const { error: moduleError } = await supabase
-      .from('modules')
-      .insert(modulesData);
+      const { error: moduleError } = await supabase
+        .from('modules')
+        .insert(modulesToInsert);
 
-    if (moduleError) {
-      console.error('Error inserting modules:', moduleError);
-      return res.status(400).json({ error: 'Error inserting modules' });
+      if (moduleError) {
+        console.error('Error inserting modules:', moduleError);
+        return res.status(400).json({ error: 'Error inserting modules' });
+      }
     }
-  }
 
     res.status(200).json({ message: 'Course and modules added successfully' });
   } catch (error) {

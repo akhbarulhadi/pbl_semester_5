@@ -30,6 +30,7 @@ const DashboardPengajar = () => {
   const [totalJoinedCount, setTotalJoinedCount] = useState(0);
   const [totalUser, setTotalUser] = useState(0);
   const [totalKelas, setTotalKelas] = useState(0);
+  const [balance, setBalance] = useState(0);
 
 
   useEffect(() => {
@@ -93,6 +94,7 @@ const DashboardPengajar = () => {
         setTotalKelas(data.total_courses);
         setTotalUser(data.total_unique_joined_users);
         setTotalJoinedCount(data.total_joined_users);
+        setBalance(data.balance[0].balance);
       })
       .catch((error) => console.error('Fetch error:', error));
   }, []);
@@ -103,9 +105,9 @@ const DashboardPengajar = () => {
         <Link to="/pengajar/form-income" className="block">
           <DataIncome
             title="Total Income"
-            total="Rp.180000"
-            rate="-0.23%"
-            levelDown
+            total={new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(balance)}
+            // rate="-0.23%"
+            // levelDown
           >
             <svg
               className="fill-primary dark:fill-white"

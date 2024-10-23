@@ -104,59 +104,147 @@ router.post("/pay-course", authMiddleware, async (req, res) => {
 });
 
 // ! ini notifikasi midtrans sekarang
+// router.post("/midtrans-notification", async (req, res) => {
+//   const { order_id, transaction_status, payment_type } = req.body;
+
+//   try {
+//       // Update status pembayaran berdasarkan notifikasi Midtrans
+//       let payment_status = 'pending';
+//       if (transaction_status === 'settlement' || transaction_status === 'capture') {
+//           payment_status = 'paid';
+//       } else if (transaction_status === 'cancel' || transaction_status === 'expire') {
+//           payment_status = 'failed';
+//       }
+
+//       // Update status pembayaran di database
+//       const { data: paymentData, error: paymentError } = await supabase
+//           .from("user_payment_courses")
+//           .update({ payment_status, payment_method: payment_type, payment_date: new Date() })
+//           .eq("transaction_id", order_id);
+
+//       if (paymentError) throw paymentError;
+
+//       // Jika pembayaran berhasil, tambahkan data ke tabel join_courses
+//       if (payment_status === 'paid') {
+//           // Ambil detail kursus dan pengguna berdasarkan order_id
+//           const { data: paymentRecord, error: paymentRecordError } = await supabase
+//               .from("user_payment_courses")
+//               .select("id_user, id_course")
+//               .eq("transaction_id", order_id)
+//               .single();
+
+//           if (paymentRecordError || !paymentRecord) throw new Error("Detail transaksi tidak ditemukan");
+
+//           const { id_user, id_course } = paymentRecord;
+
+//           const { data: joinData, error: joinError } = await supabase
+//               .from("join_courses")
+//               .insert([{
+//                   id_user: id_user,
+//                   id_course: id_course,
+//               }]);
+
+//           if (joinError) throw joinError;
+//       }
+
+//       res.status(200).json({ 
+//           message: "Notifikasi diterima", 
+//           data: paymentData,
+//           status: payment_status,
+//       });
+//   } catch (error) {
+//       console.error('Error dalam Midtrans Notification:', error.message);
+//       res.status(500).json({ error: error.message });
+//   }
+// });
+
 router.post("/midtrans-notification", async (req, res) => {
-  const { order_id, transaction_status, payment_type } = req.body;
+    const { order_id, transaction_status, payment_type } = req.body;
 
-  try {
-      // Update status pembayaran berdasarkan notifikasi Midtrans
-      let payment_status = 'pending';
-      if (transaction_status === 'settlement' || transaction_status === 'capture') {
-          payment_status = 'paid';
-      } else if (transaction_status === 'cancel' || transaction_status === 'expire') {
-          payment_status = 'failed';
-      }
+    try {
+        // Update status pembayaran berdasarkan notifikasi Midtrans
+        let payment_status = 'pending';
+        if (transaction_status === 'settlement' || transaction_status === 'capture') {
+            payment_status = 'paid';
+        } else if (transaction_status === 'cancel' || transaction_status === 'expire') {
+            payment_status = 'failed';
+        }
 
-      // Update status pembayaran di database
-      const { data: paymentData, error: paymentError } = await supabase
-          .from("user_payment_courses")
-          .update({ payment_status, payment_method: payment_type, payment_date: new Date() })
-          .eq("transaction_id", order_id);
+        // Update status pembayaran di database
+        const { data: paymentData, error: paymentError } = await supabase
+            .from("user_payment_courses")
+            .update({ payment_status, payment_method: payment_type, payment_date: new Date() })
+            .eq("transaction_id", order_id);
 
-      if (paymentError) throw paymentError;
+        if (paymentError) throw paymentError;
 
-      // Jika pembayaran berhasil, tambahkan data ke tabel join_courses
-      if (payment_status === 'paid') {
-          // Ambil detail kursus dan pengguna berdasarkan order_id
-          const { data: paymentRecord, error: paymentRecordError } = await supabase
-              .from("user_payment_courses")
-              .select("id_user, id_course")
-              .eq("transaction_id", order_id)
-              .single();
+        // Jika pembayaran berhasil, tambahkan data ke tabel join_courses
+        if (payment_status === 'paid') {
+            // Ambil detail kursus dan pengguna berdasarkan order_id
+            const { data: paymentRecord, error: paymentRecordError } = await supabase
+                .from("user_payment_courses")
+                .select("id_user, id_course, price, id_user_teacher") // Get id_user_teacher as well
+                .eq("transaction_id", order_id)
+                .single();
 
-          if (paymentRecordError || !paymentRecord) throw new Error("Detail transaksi tidak ditemukan");
+            if (paymentRecordError || !paymentRecord) throw new Error("Detail transaksi tidak ditemukan");
 
-          const { id_user, id_course } = paymentRecord;
+            const { id_user, id_course, price, id_user_teacher } = paymentRecord;
 
-          const { data: joinData, error: joinError } = await supabase
-              .from("join_courses")
-              .insert([{
-                  id_user: id_user,
-                  id_course: id_course,
-              }]);
+            // Insert to join_courses
+            const { data: joinData, error: joinError } = await supabase
+                .from("join_courses")
+                .insert([{ id_user: id_user, id_course: id_course }]);
 
-          if (joinError) throw joinError;
-      }
+            if (joinError) throw joinError;
 
-      res.status(200).json({ 
-          message: "Notifikasi diterima", 
-          data: paymentData,
-          status: payment_status,
-      });
-  } catch (error) {
-      console.error('Error dalam Midtrans Notification:', error.message);
-      res.status(500).json({ error: error.message });
-  }
+            // Update or insert into teacher_balance
+            // Check if the teacher's balance already exists
+            const { data: balanceRecord, error: balanceError } = await supabase
+                .from("teacher_balance")
+                .select("id, balance")
+                .eq("id_user_teacher", id_user_teacher)
+                .single();
+
+            let newBalance = price; // Start with the price from the payment
+
+            if (balanceError) throw balanceError;
+
+            // If a balance record exists, update it
+            if (balanceRecord) {
+                newBalance += balanceRecord.balance; // Add to existing balance
+                const { error: updateBalanceError } = await supabase
+                    .from("teacher_balance")
+                    .update({ balance: newBalance, updated_at: new Date() })
+                    .eq("id", balanceRecord.id);
+                
+                if (updateBalanceError) throw updateBalanceError;
+            } else {
+                // If no record exists, create a new one
+                const { error: insertBalanceError } = await supabase
+                    .from("teacher_balance")
+                    .insert([{
+                        id_user_teacher,
+                        created_at: new Date(),
+                        balance: newBalance,
+                        updated_at: new Date()
+                    }]);
+
+                if (insertBalanceError) throw insertBalanceError;
+            }
+        }
+
+        res.status(200).json({ 
+            message: "Notifikasi diterima", 
+            data: paymentData,
+            status: payment_status,
+        });
+    } catch (error) {
+        console.error('Error dalam Midtrans Notification:', error.message);
+        res.status(500).json({ error: error.message });
+    }
 });
+
 
 // ! ini unutk testing notifikasi midtrans sebelumnya
 // router.post("/midtrans-notification", async (req, res) => {

@@ -5,15 +5,14 @@ const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 const rateLimit = require('express-rate-limit');
 const useragent = require('express-useragent'); // Import express-useragent
+const authMiddleware = require('../middleware/authMiddleware'); // Import middleware autentikasi
 
 // ! Buat client Supabase
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const upload = multer({ dest: 'uploads/' });
+
 
 // Gunakan middleware express-useragent
 router.use(useragent.express());
@@ -181,119 +180,112 @@ router.post('/refresh-token', async (req, res) => {
 
 
 
-// * Route untuk register
-router.post('/register', async (req, res) => {
-  const { email, password } = req.body;
+// * Route untuk register (dulu)
+// router.post('/register', async (req, res) => {
+//   const { email, password } = req.body;
 
-  // Cek apakah email dan password diberikan
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email dan password wajib diisi' });
+//   // Cek apakah email dan password diberikan
+//   if (!email || !password) {
+//     return res.status(400).json({ error: 'Email dan password wajib diisi' });
+//   }
+
+//   // Mendaftarkan pengguna baru dengan Supabase
+//   const { data, error } = await supabase.auth.signUp({
+//     email,
+//     password,
+//   });
+
+//   if (error || !data.user) {
+//     return res.status(400).json({ error: 'Gagal mendaftarkan pengguna: ' + error.message });
+//   }
+
+//   // Buat token JWT untuk autentikasi
+//   const token = jwt.sign(
+//     { id: data.user.id, email: data.user.email },
+//     process.env.ACCESS_TOKEN_SECRET,
+//     { expiresIn: '1h' }
+//   );
+
+//   // Simpan token dalam HttpOnly cookie
+//   res.cookie('token', token, {
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === 'production',
+//     sameSite: 'Strict',
+//     maxAge: 60 * 60 * 1000, // Cookie berlaku selama 1 jam
+//   });
+
+//   res.status(201).json({ message: 'Registrasi berhasil. Silakan cek email untuk verifikasi.' });
+// });
+
+
+
+// Konfigurasi Multer untuk penyimpanan file
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/user/'); // Tentukan folder penyimpanan file
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); // Tambahkan suffix untuk mencegah duplikat
+    cb(null, uniqueSuffix + '-' + file.originalname); // Nama file akan unik
   }
-
-  // Mendaftarkan pengguna baru dengan Supabase
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-
-  if (error || !data.user) {
-    return res.status(400).json({ error: 'Gagal mendaftarkan pengguna: ' + error.message });
-  }
-
-  // Buat token JWT untuk autentikasi
-  const token = jwt.sign(
-    { id: data.user.id, email: data.user.email },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: '1h' }
-  );
-
-  // Simpan token dalam HttpOnly cookie
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
-    maxAge: 60 * 60 * 1000, // Cookie berlaku selama 1 jam
-  });
-
-  res.status(201).json({ message: 'Registrasi berhasil. Silakan cek email untuk verifikasi.' });
 });
 
-router.post('/add-teacher', upload.single('foto_pengajar'), async (req, res) => {
-  const { nama_pengajar, email, password, role } = req.body;
-  const foto_pengajar = req.file;
+// Inisialisasi upload middleware
+const upload = multer({ storage: storage });
 
-  // Buat akun pengajar di auth Supabase
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
+// * Route untuk register
+router.post('/signup', upload.single('foto_pengajar'), async (req, res) => { // Ganti nama file dengan 'foto_pengajar'
+  console.log("Body Request:", req.body); // Log body request untuk debugging
 
-  if (error) {
-    return res.status(400).json({ error: error.message });
+  const { nama, email, password, role, no_telepon } = req.body;
+  const imageUrl = req.file ? `/uploads/user/${req.file.filename}` : null; // URL file yang di-upload
+
+  if (!email || !password || !nama) {
+    return res.status(400).json({ error: 'Email, password, dan nama pengajar wajib diisi' });
   }
-
-  // Validasi jika file tidak ada
-  if (!foto_pengajar) {
-    return res.status(400).json({ error: 'Foto pengajar wajib diunggah' });
-  }
-  
-  // Upload file foto pengajar ke Supabase Storage
-  const fotoPath = foto_pengajar.path;
-  const fotoExt = path.extname(foto_pengajar.originalname);
-  const storagePath = `users_photos/${data.user.id}${fotoExt}`;
 
   try {
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('users_photos') // Pastikan bucket storage 'users_photos' sudah dibuat di Supabase
-      .upload(storagePath, fs.createReadStream(fotoPath), {
-        contentType: foto_pengajar.mimetype,
-        cacheControl: '3600',
-      });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: null } // Nonaktifkan konfirmasi email
+    });
 
-    if (uploadError) {
-      fs.unlinkSync(fotoPath); // Hapus file sementara
-      return res.status(400).json({ error: uploadError.message });
+    if (error || !data.user) {
+      return res.status(400).json({ error: 'Gagal mendaftarkan pengguna: ' + error.message });
     }
 
-    // Mendapatkan URL foto yang diupload
-    const { data: publicURL } = supabase.storage
-      .from('users_photos')
-      .getPublicUrl(storagePath);
+    console.log('User ID:', data.user.id);
 
-    // Simpan data pengajar di tabel 'users'
     const { error: insertError } = await supabase
       .from('users')
       .insert([{
         id_user: data.user.id,
-        name: nama_pengajar,
-        role: role || 'Teacher', // Role default "teacher" jika tidak ada di body request
-        foto: publicURL.publicUrl, // Simpan URL foto
-        // created_at: new Date(),
+        name: nama,
+        role: role || 'Student',
+        no_telp: no_telepon,
+        foto: imageUrl // Simpan URL gambar
       }]);
 
     if (insertError) {
-      fs.unlinkSync(fotoPath); // Hapus file sementara jika gagal insert
       return res.status(400).json({ error: insertError.message });
     }
 
-    // Hapus file sementara setelah upload berhasil
-    fs.unlinkSync(fotoPath);
-
-    // Berhasil menambahkan pengajar
     return res.status(200).json({
-      message: 'Pengajar berhasil ditambahkan',
+      message: 'User berhasil ditambahkan',
       data: {
         id_user: data.user.id,
-        name: nama_pengajar,
-        role: role || 'teacher',
-        foto: publicURL.publicUrl,
-      }
+        name: nama,
+        role: role || 'Student',
+        no_telp: no_telepon,
+        foto: imageUrl
+      },
     });
   } catch (error) {
-    fs.unlinkSync(fotoPath); // Hapus file jika ada error yang tidak terduga
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
 });
+
 
 // * Route untuk login
 // router.post('/', async (req, res) => {
@@ -376,5 +368,41 @@ router.post('/logout', (req, res) => {
   res.json({ message: 'Logout berhasil' });
 });
 
+router.get('/profile', authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    // Query untuk mengambil data dari tabel public.users
+    const { data: publicUser, error: publicUsersError } = await supabase
+      .from('users')
+      .select('name, created_at, role, id_user, no_telp, foto')
+      .eq('id_user', userId)
+      .single(); // Menggunakan single karena kita hanya mengambil satu user berdasarkan id_user
+
+    if (publicUsersError) {
+      return res.status(400).json({ error: 'Error fetching public users: ' + publicUsersError.message });
+    }
+
+    // Query untuk mengambil data dari auth.users menggunakan Supabase Admin API
+    const { data: authUsers, error: authUsersError } = await supabase.auth.admin.listUsers();
+
+    if (authUsersError) {
+      return res.status(400).json({ error: 'Error fetching auth users: ' + authUsersError.message });
+    }
+
+    // Cari user yang sesuai di authUsers berdasarkan id_user
+    const authUser = authUsers.users.find(au => au.id === publicUser.id_user);
+
+    // Gabungkan data dari publicUser dan authUser
+    const mergedData = {
+      ...publicUser,
+      email: authUser ? authUser.email : null,
+      last_sign_in_at: authUser ? authUser.last_sign_in_at : null,
+    };
+
+    return res.status(200).json(mergedData); // Kembalikan data user yang sudah digabung
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error: ' + error.message });
+  }
+});
 
 module.exports = router;
