@@ -15,6 +15,8 @@ import Drawer from './LandingPage/Home';
 import './index.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import ProfileLayout from 'pengguna/ProfileLayout';
+import ProfileU from 'pengguna/ProfileU';
 
 // MainContent untuk routing berdasarkan role
 const MainContent = () => {
@@ -36,7 +38,7 @@ const MainContent = () => {
   return (
     <>
       {!hideDrawer && <Drawer />}
-      <main className="p-4">
+      <main>
         <Routes>
           <Route path="/" element={<Product />} />
           <Route path="/product" element={<Product />} />

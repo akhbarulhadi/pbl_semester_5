@@ -40,10 +40,10 @@ const LihatKelasDetail = () => {
   const kelas = kelasYangDiikuti.find(k => k.id === parseInt(id));
 
   return (
-    <section className="relative mt-16 w-full min-h-screen">
-      <div className="container md:ml-16 mx-auto p-4">
-        {kelas ? (
-          <div className="bg-gray-200 p-6 rounded-lg shadow-md transition-transform duration-300 hover:scale-105">
+    <section className="relative w-full px-4 py-16 md:px-8 md:py-20 bg-gradient-to-r from-green-400 to-[#84D68E]">
+      <div className="container mx-auto px-4 mt-9 max-w-6xl">
+      {kelas ? (
+        <div className="grid md:grid-cols-2 gap-12 items-center">
             <img src={kelas.gambar} alt={kelas.judul} className="w-full h-48 object-cover rounded-lg mb-3" />
             <h1 className="text-2xl font-bold text-black mb-3">{kelas.judul}</h1>
             <p className="text-black mb-3 text-sm">{kelas.deskripsi}</p>

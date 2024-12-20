@@ -22,8 +22,7 @@ const PengaturanU = () => {
   };
 
   return (
-    <section className="relative mt-20 bg-gradient-to-r from-blue-100 to-white w-full">
-    <div className="container mx-auto p-4 md:ml-72 pt-16">
+    <div className="container mx-auto p-4 pl-64">
       <h1 className="text-3xl font-bold mb-4">Pengaturan Akun</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -78,7 +77,6 @@ const PengaturanU = () => {
         </button>
       </form>
     </div>
-    </section>
     
   );
 };

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 const SidebarDetailKursus = () => {
+  const { id_course } = useParams();
   const [kursusData, setKursusData] = useState(null);
   const [activeVideo, setActiveVideo] = useState({ url: null, header: '' });
   const [isModulesOpen, setIsModulesOpen] = useState(false);
-  const { id_course } = useParams();
   const [updatedModules, setUpdatedModules] = useState([]);
+  const [hasCompletedCourse, setHasCompletedCourse] = useState(false); // state to track completion
 
   const extractYoutubeVideoId = (url) => {
     if (!url) return null;
@@ -22,6 +23,17 @@ const SidebarDetailKursus = () => {
         const data = await response.json();
         setKursusData(data);
         setUpdatedModules(data.modules);
+
+        // Check if course is completed
+        const token = document.cookie.match(/token=([^;]*)/)?.[1];
+        const completionResponse = await fetch(`/api/user/courses/${id_course}/completion`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        const completionData = await completionResponse.json();
+        setHasCompletedCourse(completionData.has_completed);
       } catch (error) {
         console.error('Error fetching course data:', error);
       }
@@ -48,7 +60,6 @@ const SidebarDetailKursus = () => {
       if (data.message) {
         console.log(data.message);
 
-        // Fetch updated module data after opening a module
         const updatedResponse = await fetch(`/api/pengguna/courses/${id_course}`);
         const updatedData = await updatedResponse.json();
         setUpdatedModules(updatedData.modules);
@@ -59,95 +70,130 @@ const SidebarDetailKursus = () => {
   };
 
   return (
-    <section className="relative mt-20 w-full min-h-screen h-full">
-      <div className="flex h-screen mt-24">
-        <div className="w-64 bg-gray-200 fixed shadow-lg transition-colors duration-300 rounded-lg">
-          <div className="p-4 flex items-center justify-between border-b border-gray-300">
-            <h2 className="text-gray-800 font-semibold text-xl">Modul Pelatihan</h2>
-          </div>
-
-          <div className="p-4">
-            <div className="accordion">
-              <div className="accordion-item">
-                <h2 className="accordion-header">
-                  <button
-                    className={`w-full text-left p-3 rounded-lg flex justify-between items-center transition duration-300`}
-                    onClick={() => {
-                      const videoId = extractYoutubeVideoId(kursusData?.trailer_video_youtube);
-                      const videoUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
-                      setActiveVideo({ url: videoUrl, header: 'Trailer Kelas' });
-                    }}
-                    aria-expanded={activeVideo.url === `https://www.youtube.com/embed/${extractYoutubeVideoId(kursusData?.trailer_video_youtube)}`}
-                  >
-                    <h6 className="text-lg font-semibold">Trailer Kelas</h6>
-                    <span className={`transform transition-transform duration-300 ${activeVideo.url === `https://www.youtube.com/embed/${extractYoutubeVideoId(kursusData?.trailer_video_youtube)}` ? 'rotate-180' : ''}`}>▼</span>
-                  </button>
-                </h2>
-              </div>
-
-              <div className="accordion-item">
-                <h2 className="accordion-header">
-                  <button
-                    className={`w-full text-left p-3 rounded-lg flex justify-between items-center transition duration-300`}
-                    onClick={() => setIsModulesOpen(!isModulesOpen)}
-                    aria-expanded={isModulesOpen}
-                  >
-                    <h6 className="text-lg font-semibold">Daftar Modul Video</h6>
-                    <span className={`transform transition-transform duration-300 ${isModulesOpen ? 'rotate-180' : ''}`}>▼</span>
-                  </button>
-                </h2>
-
-                {isModulesOpen && (
-                  <div className="pl-4">
-                    {updatedModules && updatedModules.map((module, index) => (
-                      <button
-                        key={module.id_modules}
-                        className={`w-full text-left p-2 rounded-lg flex justify-between items-center transition duration-300 hover:bg-gray-300`}
-                        onClick={() => handleModuleClick(module)}
-                        style={{
-                          cursor: index === 0 || updatedModules[index - 1].isOpened ? 'pointer' : 'not-allowed',
-                          marginBottom: '10px',
-                          color: module.isOpened ? 'green' : (index === 0 || updatedModules[index - 1].isOpened ? 'gray' : 'red'),
-                        }}
-                        disabled={index > 0 && !updatedModules[index - 1].isOpened}
-                      >
-                        <h6 className="text-lg font-semibold">{module.header}</h6>
-                      </button>
-                    ))}
-                  </div>
-                )}
+    <div className="bg-gray-50 mt-9 min-h-screen font-poppins">
+      {kursusData ? (
+        <div className="">
+          {/* Bagian Atas: Informasi Kursus */}
+          <div className="">
+          <section className="relative w-full px-4 py-16 md:px-8 md:py-20 bg-[#E6EFDF]">
+            <div className="flex items-start">
+              <img
+                src={`/api/${kursusData.image_url}`}
+                alt={kursusData.course_title}
+                className="w-90 h-64 object-cover rounded-lg mr-8"
+              />
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">{kursusData.course_title}</h1>
+                <p className="text-gray-600 mb-6">{kursusData.course_description}</p>
+                <div className="flex items-center justify-between">
+                  {/* Jumlah Peserta */}
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Peserta:</span>{' '}
+                    {Array.isArray(kursusData.joined_users) ? kursusData.joined_users.length : 0} orang
+                  </p>
+                  {/* Tanggal Mulai */}
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Tanggal Mulai:</span>{' '}
+                    {kursusData.start_date
+                      ? new Date(kursusData.start_date).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })
+                      : 'Belum tersedia'}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="ml-64 p-6 flex-grow">
-          {kursusData ? (
-            <>
-              <h3 className="text-gray-800 font-semibold text-2xl mb-2">{kursusData.course_title}</h3>
-              <p className="text-gray-600 mb-4">{kursusData.course_description}</p>
-              <div className="shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
-                <h3 className="text-gray-800 font-semibold text-2xl mb-2">{activeVideo.header}</h3>
-                {activeVideo.url && (
+            {/* Tombol Forum Diskusi */}
+            <button
+              onClick={() => window.location.href = '/forum-diskusi'}
+              className="absolute bottom-4 right-4 bg-[#84D68E] text-white px-6 py-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300"
+            >
+              Forum Diskusi
+            </button>
+          </section>
+        </div>         
+
+          {/* Bagian Konten: Video dan Tahapan */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-12">
+            {/* Sidebar Modul */}
+            <div className="lg:col-span-1 bg-white shadow-lg rounded-lg p-6 h-full">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Tahapan Latihan</h2>
+              <div>
+                <button
+                  onClick={() => {
+                    const videoId = extractYoutubeVideoId(kursusData.trailer_video_youtube);
+                    const videoUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+                    setActiveVideo({ url: videoUrl, header: 'Trailer Kelas' });
+                  }}
+                  className="w-full text-left py-3 px-4 rounded-lg bg-gray-100 hover:bg-gray-200 mb-3"
+                >
+                  Trailer Kelas
+                </button>
+                {updatedModules.map((module, index) => (
+                  <button
+                    key={module.id_modules}
+                    onClick={() => handleModuleClick(module)}
+                    className={`w-full text-left py-3 px-4 rounded-lg ${
+                      module.isOpened ? 'bg-green-100 hover:bg-green-200' : 'bg-gray-100 hover:bg-gray-200'
+                    } mb-3`}
+                    disabled={index > 0 && !updatedModules[index - 1].isOpened}
+                  >
+                    {module.header}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Konten Video */}
+            <div className="lg:col-span-2 bg-white shadow-lg rounded-lg p-6">
+              {activeVideo.url ? (
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">{activeVideo.header}</h3>
                   <div className="relative w-full h-0" style={{ paddingBottom: '56.25%' }}>
                     <iframe
                       src={activeVideo.url}
-                      title="Video Kelas"
-                      className="absolute top-0 left-0 w-full h-full rounded-xl mb-6 shadow-lg"
+                      title="Video Player"
+                      className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     ></iframe>
                   </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <p className="text-red-500 text-lg font-semibold">Kursus tidak ditemukan.</p>
-          )}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-lg">Pilih modul untuk mulai belajar.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Tombol Sertifikat */}
+          <div className="mt-6 text-center">
+            {hasCompletedCourse ? (
+              <a
+                href={`/api/pengguna/courses/${id_course}/certificate`}
+                className="py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+              >
+                Lihat Sertifikat
+              </a>
+            ) : (
+              <>
+                <a
+                  href="#"
+                  className="py-3 px-6 bg-gray-400 text-gray-600 font-semibold rounded-lg cursor-not-allowed"
+                >
+                  Selesaikan Pelatihan untuk Mendapatkan Sertifikat
+                </a>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </section>
+      ) : (
+        <p className="text-center text-red-500 text-xl font-bold py-20">Kursus tidak ditemukan.</p>
+      )}
+    </div>
   );
 };
 

@@ -1,110 +1,162 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const DashboardU = () => {
-  const navigate = useNavigate();
+const Home = () => {
+  const [courses, setCourses] = useState([]);
 
-  // Data kelas yang diikuti pengguna
-  const kelasYangDiikuti = [
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        let response = await fetch('/api/pengguna/courses/semua-kursus', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (response.status === 401) {
+          const refreshResponse = await fetch('/api/auth/refresh-token', {
+            method: 'POST',
+            credentials: 'include',
+          });
+
+          if (refreshResponse.ok) {
+            response = await fetch('/api/pengguna/courses/semua-kursus', {
+              method: 'GET',
+              credentials: 'include',
+            });
+          } else {
+            throw new Error('Refresh token failed');
+          }
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setCourses(data);
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  const groupedClasses = [
     {
-      id: 3,
-      judul: "Dasar-dasar Machine Learning",
-      status: "Sedang Berlangsung",
-      tanggalMulai: "05 Oktober 2024",
-      gambar: "https://via.placeholder.com/150",
+      category: 'Iphone',
+      classes: courses.filter((course) => course.category === 'Iphone'),
     },
-  ]; // Kosongkan untuk menunjukkan tidak ada kursus yang diikuti
-
-  // Data riwayat transaksi
-  const riwayatTransaksi = [
     {
-      id: 1234567890,
-      judulKelas: "Belajar React untuk Pemula",
-      tanggalPembelian: "30 September 2024",
-      totalBiaya: "Rp 500.000",
-      status: "Berhasil",
+      category: 'Macbook',
+      classes: courses.filter((course) => course.category === 'Macbook'),
     },
-  ]; // Kosongkan untuk menunjukkan tidak ada transaksi
+    {
+      category: 'Imac',
+      classes: courses.filter((course) => course.category === 'Imac'),
+    },
+    {
+      category: 'Iwatch',
+      classes: courses.filter((course) => course.category === 'Iwatch'),
+    },
+    {
+      category: 'Ipad',
+      classes: courses.filter((course) => course.category === 'Ipad'),
+    },
+    {
+      category: 'Airpods',
+      classes: courses.filter((course) => course.category === 'Airpods'),
+    },
+  ];
 
   return (
-      <div className="container mx-auto p-3">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-black-600">Welcome to Your Dashboard</h1>
-          <p className="text-sm text-gray-600">Berikut adalah kelas yang sedang Anda ikuti.</p>
-        </div>
+    <div className="container mx-auto px-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Jelajahi dan <span className="text-[#84D68E]">Tingkat</span> Skill Mu
+      </h1>
 
-        {/* Cek apakah ada kelas yang diikuti */}
-        {kelasYangDiikuti.length === 0 && riwayatTransaksi.length === 0 ? (
-          <div className="text-center mt-8">
-            <img
-              src="https://via.placeholder.com/150" // Ganti dengan URL gambar yang sesuai
-              alt="Belum ada kursus"
-              className="mx-auto mb-3 w-20 h-20 object-cover"
-            />
-            <h2 className="text-lg font-semibold text-gray-800">Anda belum mengikuti kursus atau melakukan transaksi.</h2>
-            <p className="text-gray-600 mt-1 text-xs">Silakan cari kursus baru untuk memulai.</p>
-            <button
-              className="mt-3 inline-block px-3 py-1 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 text-xs"
-              onClick={() => navigate('/pengguna/semua-kursus')}
-            >
-              Temukan Kursus
-            </button>
+      {groupedClasses.map((group, index) => (
+        <div key={index} className="mb-12">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-18px font-semibold">{group.category}</h2>
+            {group.classes.length > 4 && (
+              <Link
+                to={`/kursus/${group.category}`}
+                className="bg-[#84D68E] text-white px-4 py-2 rounded-full"
+              >
+                Lihat Kursus Lainnya
+              </Link>
+            )}
           </div>
-        ) : (
-          <>
-            {/* Grid Layout for classes */}
-            <h2 className="text-lg font-semibold mb-2 text-gray-800">Kursus Saya</h2>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Render kelas yang diikuti */}
-              {kelasYangDiikuti.map(kelas => (
-                <div 
-                  key={kelas.id} 
-                  className="bg-gray-200 p-3 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg relative cursor-pointer border border-gray-300"
-                  onClick={() => navigate(`/pengguna/LihatKelas/${kelas.id}`)}
-                >
-                  <img src={kelas.gambar} alt={kelas.judul} className="w-full h-28 object-cover rounded-lg mb-2" />
-                  <h2 className="text-base font-semibold text-blue-600 mb-1">{kelas.judul}</h2>
-                  <p className="text-gray-700 mb-1 text-xs">
-                    Status: 
-                    <span className={`ml-1 ${kelas.status === 'Sedang Berlangsung' ? 'text-green-500' : 'text-yellow-500'}`}>
-                      {kelas.status === 'Sedang Berlangsung' ? <FaCheckCircle className="inline mr-1" /> : <FaTimesCircle className="inline mr-1" />}
-                      {kelas.status}
-                    </span>
-                  </p>
-                  <p className="text-gray-700 text-xs">Tanggal Mulai: {kelas.tanggalMulai}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Riwayat Transaksi */}
-            <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-2 text-gray-800">Riwayat Transaksi</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Render riwayat transaksi */}
-                {riwayatTransaksi.map(transaksi => (
-                  <div 
-                    key={transaksi.id} 
-                    className="bg-gray-200 p-3 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg relative cursor-pointer border border-gray-300"
-                    onClick={() => navigate(`/pengguna/transaksi/${transaksi.id}`)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {group.classes.slice(0, 4).map((course) => (
+              <div
+                key={course.id_course}
+                className="relative cursor-pointer shadow-lg border rounded-b-[22px] overflow-hidden"
+                style={{
+                  width: '271.98px',
+                  height: '289.18px',
+                  borderRadius: '0px 0px 22px 22px',
+                }}
+                onClick={() =>
+                  window.location.href =
+                    course.joined_users.length === 0
+                      ? `/pengguna/KursusDetail/${course.id_course}`
+                      : `/pengguna/kursus/${course.id_course}`
+                }
+              >
+                <img
+                  src={`/api/${course.image_url}`}
+                  alt={course.course_title}
+                  className="w-full h-48 object-cover"
+                  style={{ opacity: '1' }}
+                />
+                <div className="p-4 bg-white">
+                  <h3
+                    className="font-semibold mb-2"
+                    style={{ fontSize: '12px' }}
                   >
-                    <h3 className="text-base font-semibold text-blue-600 mb-1">{transaksi.judulKelas}</h3>
-                    <p className="text-gray-700 text-xs">Tanggal Pembelian: {transaksi.tanggalPembelian}</p>
-                    <p className="text-gray-700 text-xs">Total Biaya: {transaksi.totalBiaya}</p>
-                    <p className="text-gray-700 text-xs">Status: 
-                      <span className={`ml-1 ${transaksi.status === 'Berhasil' ? 'text-green-500' : 'text-red-500'}`}>
-                        {transaksi.status}
-                      </span>
-                    </p>
-                  </div>
-                ))}
+                    {course.course_title}
+                  </h3>
+                  <p
+                    className="text-gray-600 mb-2"
+                    style={{ fontSize: '12px' }}
+                  >
+                    {course.description}
+                  </p>
+                  <span
+                    className="text-green-500 font-bold"
+                    style={{ fontSize: '12px' }}
+                  >
+                    {course.paid === false
+                      ? 'Gratis'
+                      : course.joined_users.length === 0
+                      ? `Rp ${course.price}`
+                      : 'Sudah dibeli'}
+                  </span>
+                </div>
+                {/* Bintang */}
+                <div className="absolute bottom-2 right-2 flex items-center space-x-1 bg-white p-1 ">
+                  {[1, 2, 3, 4, 5].map((star, idx) => (
+                    <svg
+                      key={idx}
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill={idx < course.rating ? 'gold' : 'gray'}
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01z" />
+                    </svg>
+                  ))}
+                </div>
               </div>
-            </div>
-          </>
-        )}
-      </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 
-export default DashboardU;
+export default Home;

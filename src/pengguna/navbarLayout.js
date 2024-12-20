@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Navbar from './NavbarU'; // Pastikan Anda sudah punya komponen Navbar
+import Navbar from './Usidebar'; // Pastikan Anda sudah punya komponen Navbar
 
 const NavbarLayout = () => {
   return (
