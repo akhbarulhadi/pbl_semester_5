@@ -1,112 +1,178 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+
 
 const RiwayatTransaksi = () => {
   const [transactions, setTransactions] = useState([]);
-    // Data contoh transaksi
-    // const transactions = [
-    //   {
-    //     idTransaksi: "TRX001",
-    //     idPengajar: "PGJ001",
-    //     idPengguna: "PNG001",
-    //     norekening: "1234567890",
-    //     namarekening: "John Doe",
-    //     namabank: "Bank A",
-    //     pemasukan: 500000,
-    //     pengeluaran: 200000,
-    //   },
-    //   {
-    //     idTransaksi: "TRX002",
-    //     idPengajar: "PGJ002",
-    //     idPengguna: "PNG002",
-    //     norekening: "0987654321",
-    //     namarekening: "Jane Smith",
-    //     namabank: "Bank B",
-    //     pemasukan: 750000,
-    //     pengeluaran: 300000,
-    //   },
-    //   // Tambahkan lebih banyak data sesuai kebutuhan
-    // ];
+  const location = useLocation(); // Mendapatkan lokasi saat ini
 
-    useEffect(() => {
-      const fetchTransactions = async () => {
-        try {
-          let response = await fetch('/api/admin/courses/list-transactions', {
-            method: 'GET',
-            credentials: 'include',
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        let response = await fetch("/api/admin/courses/list-transactions", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.status === 401) {
+          // Token mungkin kedaluwarsa, coba refresh token
+          const refreshResponse = await fetch("/api/auth/refresh-token", {
+            method: "POST",
+            credentials: "include",
           });
-    
-          if (response.status === 401) { // Token mungkin kedaluwarsa
-            // Panggil refresh token
-            const refreshResponse = await fetch('/api/auth/refresh-token', {
-              method: 'POST',
-              credentials: 'include',
+
+          if (refreshResponse.ok) {
+            response = await fetch("/api/admin/courses/list-transactions", {
+              method: "GET",
+              credentials: "include",
             });
-    
-            if (refreshResponse.ok) {
-              // Coba ulang fetch courses setelah token diperbarui
-              response = await fetch('/api/admin/courses/list-transactions', {
-                method: 'GET',
-                credentials: 'include',
-              });
-            } else {
-              throw new Error('Refresh token failed');
-            }
+          } else {
+            throw new Error("Refresh token failed");
           }
-    
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          
-          const data = await response.json();
-          setTransactions(data);
-        } catch (error) {
-          console.error('Fetch error:', error);
         }
-      };
-    
-      fetchTransactions();
-    }, []);
-  
-    return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "paid":
+        return "text-green-600"; // Warna hijau
+      case "pending":
+        return "text-yellow-600"; // Warna kuning
+      case "failed":
+        return "text-red-600"; // Warna merah
+      default:
+        return "";
+    }
+  };
+
+  return (
+    <div className="p-4">
+      {/* Teks Tab Transaksi | Pengajuan Penarikan di tengah */}
+      <div className="text-center  mb-4">
+       <Link
+          to="/admin/riwayat-transaksi"
+          className={`text-lg font-bold px-2 py-1 ml-4 transition-all duration-200 hover:bg-gray-200 hover:rounded-lg ${
+            location.pathname === '/admin/riwayat-transaksi'
+            ? 'bg-gray-200 rounded-lg'
+            : 'hover:bg-gray-600'
+          }`}
+        >
+          Transaksi
+        </Link>
+
+        <Link
+          to="/admin/pengajuan-penarikan"
+          className={`text-lg font-bold px-2 py-1 ml-4 transition-all duration-200 hover:tex-gray-200 hover:bg-gray-200 hover:rounded-lg ${
+            location.pathname === "/pengajuan-penarikan"    
+            ? 'bg-gray-200 rounded-lg'
+            : 'hover:bg-gray-600'
+          }`}
+        >
+          Pengajuan Penarikan
+        </Link>
+      </div>
+
+      {/* Tabel Transaksi */}
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col">
+          <div className="overflow-x-auto shadow-md sm:rounded-lg">
+            <div className="inline-block min-w-full align-middle">
+              <div className="overflow-hidden">
+        <table className="w-full table-auto text-sm">
           <thead>
             <tr className="bg-gray-200">
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">ID Transaksi</th>
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Kursus</th>
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Pengajar</th>
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Pengguna</th>
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Metode Pembayaran</th>
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Status Pembayaran</th>
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Harga</th>
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Tanggal Pembayaran</th>
-              <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Dibuat Pada</th>
+            <th className="h-[30px] px-5 rounded-tl-lg">Nama Pengajar</th>
+            <th className="h-[30px] px-5 ">Nama Pemilik Bank</th>
+            <th className="h-[30px] px-5 ">Nama Bank</th>
+            <th className="h-[30px] px-5 ">No Rekening</th>
+            <th className="h-[30px] px-5 ">Saldo Awal</th>
+            <th className="h-[30px] px-5 ">Pengajuan Dana</th>
+            <th className="h-[30px] px-5 ">Saldo Akhir</th>
+            <th className="h-[30px] px-5 ">Status</th>
+            <th className="h-[30px] px-5 rounded-tr-lg">Bukti Transfer</th>   
             </tr>
           </thead>
           <tbody>
-            {transactions.map((transaction) => (
-              <tr key={transaction.id_user_payment_courses} className="hover:bg-gray-100 transition-colors duration-200">
-                <td className="py-2 px-4 border-b border-gray-300">{transaction.transaction_id}</td>
-                <td className="py-2 px-4 border-b border-gray-300">{transaction.course_title}</td>
-                <td className="py-2 px-4 border-b border-gray-300">{transaction.teacher_name}</td>
-                <td className="py-2 px-4 border-b border-gray-300">{transaction.user_name}</td>
-                <td className="py-2 px-4 border-b border-gray-300">{transaction.payment_method}</td>
-                <td className={`py-2 px-4 border-b border-gray-300 
-                  ${transaction.payment_status === 'paid' ? 'text-green-600' : 
-                     transaction.payment_status === 'pending' ? 'text-yellow-600' : 'text-red-600'}`}>
-                  {transaction.payment_status === 'paid' ? 'Sukses' : 
-                   transaction.payment_status === 'pending' ? 'Tertunda' : 'Gagal'}
+            {transactions.length > 0 ? (
+              transactions.map((transaction) => (
+                <tr
+                  key={transaction.id_user_payment_courses}
+                  className="hover:bg-gray-100 transition-colors duration-200 overflow-x-auto"
+                >
+                  <td className="py-2 px-2 truncate">
+                    {transaction.transaction_id}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                    {transaction.course_title}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                    {transaction.teacher_name}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                    {transaction.user_name}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                    {transaction.payment_method}
+                  </td>
+                  <td
+                    className={`py-2 px-2 truncate ${getStatusClass(
+                      transaction.payment_status
+                    )}`}
+                  >
+                    {transaction.payment_status === "paid"
+                      ? "Sukses"
+                      : transaction.payment_status === "pending"
+                      ? "Tertunda"
+                      : "Gagal"}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(transaction.price)}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                    {transaction.payment_date
+                      ? new Date(transaction.payment_date).toLocaleDateString(
+                          "id-ID"
+                        )
+                      : "Tanggal tidak tersedia"}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                  <img src="gambar.jpg" />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9" className="py-4 px-4 text-center text-gray-500">
+                  Tidak ada data transaksi.
                 </td>
-                <td className="py-2 px-4 border-b border-gray-300">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transaction.price)}</td>
-                <td className="py-2 px-4 border-b border-gray-300">{transaction.payment_date ? new Date(transaction.payment_date).toLocaleDateString() : 'Tanggal tidak tersedia'}</td>
-                <td className="py-2 px-4 border-b border-gray-300">{new Date(transaction.created_at).toLocaleDateString()}</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
-    );
-  };
-  
-  export default RiwayatTransaksi;
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+  );
+};
+
+export default RiwayatTransaksi;

@@ -1,41 +1,19 @@
-// src/pengajar/DashboardPengajar.js
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import StatistikData from "./StatistikData";
-import DataIncome from "Pengajar/DataIncome";
-import { useNavigate } from 'react-router-dom';
-
-const listPengguna = [
-  {
-    namaPengguna: "Akhbarul Hadi",
-  },
-  {
-    namaPengguna: "Bintang Gusti",
-  },
-  {
-    namaPengguna: "Damarjati Abdullah",
-  },
-  {
-    namaPengguna: "Ibnu Pramudita",
-  },
-  {
-    namaPengguna: "Tiyo Saputra",
-  },
-  // Tambahkan lebih banyak data sesuai kebutuhan
-];
+import DataTotal from "Admin/DataTotal";
 
 const DashboardAdmin = () => {
   const [totalUser, setTotalUser] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/api/admin/teacher/count', {
-      method: 'GET',
-      credentials: 'include',
+    fetch("/api/admin/teacher/count", {
+      method: "GET",
+      credentials: "include",
     })
       .then((response) => {
         if (!response.ok) {
-          // navigate('/login');
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
@@ -44,39 +22,406 @@ const DashboardAdmin = () => {
         console.log(data);
         setTotalUser(data.userCount);
       })
-      .catch((error) => console.error('Fetch error:', error));
+      .catch((error) => console.error("Fetch error:", error));
   }, []);
 
-  return (
-    <>
-      <div class="grid grid-cols-3 gap-2">
-        <div class="col-span-2">
-          <div class="h-auto max-w-full">
-            <StatistikData/>
-          </div>
-        </div>
   
-        <div class="col-span-1 grid grid-rows-2 gap-2">
-          <div>
-            <Link to="/admin/list-peserta" className="block">
-              <DataIncome
-                title="Total Peserta"
-                total={totalUser}
-                // levelUp
-              >
-                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                  <path fill-rule="evenodd" d="M12 6a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm-1.5 8a4 4 0 0 0-4 4 2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-3Zm6.82-3.096a5.51 5.51 0 0 0-2.797-6.293 3.5 3.5 0 1 1 2.796 6.292ZM19.5 18h.5a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-1.1a5.503 5.503 0 0 1-.471.762A5.998 5.998 0 0 1 19.5 18ZM4 7.5a3.5 3.5 0 0 1 5.477-2.889 5.5 5.5 0 0 0-2.796 6.293A3.501 3.501 0 0 1 4 7.5ZM7.1 12H6a4 4 0 0 0-4 4 2 2 0 0 0 2 2h.5a5.998 5.998 0 0 1 3.071-5.238A5.505 5.505 0 0 1 7.1 12Z" clip-rule="evenodd"/>
-                </svg>
-              </DataIncome>
-            </Link>
-          </div>
-          {/* <div>
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-3.jpg" alt="" />
-          </div> */}
-        </div>
+  return (
+    <div className="p-4 md:p-6">
+      {/* Section: Summary Cards */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
+        <Link to="/saldo"  className="text-[#84D68E]">
+          <DataTotal
+            title="Total Saldo"
+            total="Rp.20.000.000"
+            tags={["Minggu Ini"]}
+         
+          />
+        </Link>
+
+        <Link to="/pembelian-kelas" className="block text-[#845ED4]">
+          <DataTotal
+            title="Total Pembelian Kelas"
+            total="350 Kelas"
+            tags={["Hari Ini", "Minggu Ini", "Bulan Ini"]}
+           
+          />
+        </Link>
+
+        <Link to="/pembelian-kelas"  className="block text-[#C739A6]">
+          <DataTotal
+            title="Total Peserta"
+            total="200 Peserta"
+           
+          />
+        </Link>
+
+        <Link to="/pembelian-kelas" className="block text-[#3CA9C2]">
+          <DataTotal
+            title="Total Pengajar"
+            total="20 Pengajar"
+            className=""
+          />
+        </Link>
       </div>
 
-    </>
+      {/* Section: Statistics and Tables */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Statistik Data */}
+        <div>
+          <StatistikData />
+        </div>
+
+        {/* Top Penjualan Kelas */}
+        <div className="col-span-2">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Top Penjualan Kelas
+          </h2>
+          <div className="shadow rounded overflow-hidden bg-white">
+            <table className="w-full table-auto text-sm">
+            <thead>
+                <tr className="text-white bg-[#6926D7]">
+                  <th className="h-[30px] px-5 rounded-tl-lg">Nama Kelas</th>
+                  <th className="px-5 h-[30px]">Harga</th>
+                  <th className="h-[30px] px-5 rounded-tr-lg">
+                    Total Pengikut
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-4 py-2">Kelas Perbaikan Xr</td>
+                  <td className="px-4 py-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(2000000)}
+                  </td>
+                  <td className="px-4 py-2">30 Peserta</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2">Kelas Perbaikan Macbook</td>
+                  <td className="px-4 py-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(2000000)}
+                  </td>
+                  <td className="px-4 py-2">20 Peserta</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2">Kelas Perbaikan Imac</td>
+                  <td className="px-4 py-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(2000000)}
+                  </td>
+                  <td className="px-4 py-2">30 Peserta</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+          {/* Pengajuan Dana */}
+
+          <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-4">
+            Pengajuan Dana
+          </h2>
+          <div className="shadow rounded overflow-hidden bg-white">
+            <table className="w-full table-auto text-sm">
+            <thead>
+                <tr className="text-white bg-[#6926D7]">
+                  <th className="h-[30px] px-5 rounded-tl-lg">Nama Pengajar</th>
+                  <th className="px-5 h-[30px]">Jumlah Pengajuan</th>
+                  <th className="h-[30px] px-5 rounded-tr-lg">
+                    Nama Bank
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr >
+                  <td className="px-4 py-2">Tazzz dung dung </td>
+                  <td className="px-4 py-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(4000000)}
+                  </td>
+                  <td className="px-4 py-2">BCA</td>
+                </tr>
+                <tr >
+                  <td className="px-4 py-2">Ling Ibnu</td>
+                  <td className="px-4 py-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(3000000)}
+                  </td>
+                  <td className="px-4 py-2">Mandiri</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2">Parhan Kevbab</td>
+                  <td className="px-4 py-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(6000000)}
+                  </td>
+                  <td className="px-4 py-2">BNI</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pengajuan Kelas */}
+
+          <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-4">
+            Pengajuan Kelas
+          </h2>
+          <div className="shadow rounded overflow-hidden bg-white">
+            <table className="w-full table-auto text-sm">
+            <thead>
+                <tr className="text-white bg-[#6926D7]">
+                  <th className="h-[30px] px-5 rounded-tl-lg">Nama Kelas</th>
+                  <th className="px-5 h-[30px]">Harga</th>
+                  <th className="h-[30px] px-5 rounded-tr-lg">
+                    Nama Pengajar
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-4 py-2">Kelas Perbaikan</td>
+                  <td className="px-4 py-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(2000000)}
+                  </td>
+                  <td className="px-4 py-2">AeronShuki</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2">Kelas Perbaikan Macbook</td>
+                  <td className="px-4 py-2">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    }).format(2000000)}
+                  </td>
+                  <td className="px-4 py-2">Grilong</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+ 
+    {/* list Pengajar */}
+
+  
+  <div className="max-w-7xl mx-auto">
+    <h2 className="text-lg font-semibold text-gray-900 mt-8">List Akun Pengajar</h2>
+      <div className="flex flex-col">
+        <div className="overflow-x-auto shadow-md sm:rounded-lg">
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden">
+<table className="w-full table-auto text-sm">
+  <thead className="bg-[#F1F3F9] ">
+  <tr className="text-black bg-[#F1F3F9]">
+                  <th className="h-[30px] px-5 rounded-tl-lg">Nama</th>
+                  <th className="px-5 h-[30px]">Email</th>
+                  <th className="px-5 h-[30px]">Saldo</th>
+                  <th className="px-5 h-[30px]">Total Kelas</th>
+                  <th className="px-5 h-[30px]">Total Peserta</th>
+                  <th className="px-5 h-[30px]">Rating</th>
+                  <th className="h-[30px] px-5 rounded-tr-lg">Status</th>
+
+                </tr>
+  </thead>
+  <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+  <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+  <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">John Doe</td>
+  <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">john.doe@example.com</td>
+  <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$5</td>
+  <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">10</td>
+  <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">100</td>
+  <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white"></td>
+  <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+
+</tr>
+
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Jane Smith</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">jane.smith@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$50</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">5</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">50</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">4.0</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Alice Johnson</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">alice.johnson@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$150</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">20</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">5.0</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+   
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">4.8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">4.8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">4.8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+    
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">4.8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">4.8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">4.8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">4.8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Aktif</td>
+
+        </tr>
+       </tbody>
+     </table>
+    </div>
+   </div>
+ </div>
+</div>
+
+   {/* List Pengguna */}
+
+  <h2 className="text-lg font-semibold text-gray-900 mt-8">List Akun Pengguna</h2>
+      <div className="flex flex-col">
+        <div className="overflow-x-auto shadow-md sm:rounded-lg">
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden">
+             <table className="w-full table-auto text-sm divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-100 dark:bg-gray-700">
+              <tr className="text-black bg-[#F1F3F9]">
+                  <th className="h-[30px] px-5 rounded-tl-lg">Usename</th>
+                  <th className="px-5 h-[30px]">Nama Lengkap</th>
+                  <th className="px-5 h-[30px]">Email</th>
+                  <th className="px-5 h-[30px]">Kelamin</th>
+                  <th className="h-[30px] px-5 rounded-tr-lg">Terakhir Login</th>
+                </tr>
+  </thead>
+  <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">John Doe</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">john.doe@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$5</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">10</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">100</td>
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Jane Smith</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">jane.smith@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$50</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">5</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">50</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Alice Johnson</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">alice.johnson@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$150</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">20</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">200</td>
+   
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+
+    </tr>
+    <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">Robert Brown</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">robert.brown@example.com</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">$200</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">8</td>
+      <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">80</td>
+    </tr>
+   </tbody>
+  </table>
+</div>
+</div>
+         </div>
+        </div>
+       </div>
+      </div>
+    </div>
   );
 };
 

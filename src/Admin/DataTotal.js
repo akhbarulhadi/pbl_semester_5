@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DataIncome = ({ title, total, tags, children }) => {
+const DataTotal = ({ title, total, tags, children }) => {
   return (
     <div className="relative rounded-sm border border-gray-200 bg-white py-6 px-7 shadow-lg">
       <div className="flex h-14 w-14 items-center justify-end">
@@ -8,7 +8,7 @@ const DataIncome = ({ title, total, tags, children }) => {
       </div>
 
       <div className="mt-4 flex items-end justify-center">
-        <div className="relative">
+        <div>
           {/* Tags Section: Positioned in the Top-Right Corner */}
           {tags && (
             <div className="absolute top-2 right-2 flex gap-2">
@@ -27,15 +27,13 @@ const DataIncome = ({ title, total, tags, children }) => {
             {total}
           </h4>
           {/* Title */}
-          <div className="text-center">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {title}
-            </span>
-          </div>
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            {title}
+          </span>
         </div>
       </div>
     </div>
   );
 };
 
-export default DataIncome;
+export default DataTotal;

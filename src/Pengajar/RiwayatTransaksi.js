@@ -72,20 +72,20 @@ const RiwayatTransaksi = () => {
 
   return (
     <div className="overflow-x-auto">
-      <h2 className="text-2xl font-bold mb-4 text-gray-700">RiwayatTransaksi</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-700">Riwayat Transaksi</h2>
 
-      <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+      <table className="w-full table-auto text-sm">
         <thead>
           <tr className="bg-gray-200">
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">ID Transaksi</th>
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Kursus</th>
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Pengajar</th>
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Pengguna</th>
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Metode Pembayaran</th>
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Status Pembayaran</th>
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Harga</th>
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Tanggal Pembayaran</th>
-            <th className="py-3 px-4 border-b border-gray-300 text-left text-sm font-semibold text-gray-700">Dibuat Pada</th>
+            <th className="h-[30px] px-5 rounded-tl-lg font-semibold text-gray-700">ID Transaksi</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Kursus</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Pengajar</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Pengguna</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Metode Pembayaran</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Status Pembayaran</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Harga</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Tanggal Pembayaran</th>
+            <th className="h-[30px] px-5 rounded-tr-lg font-semibold text-gray-700">Dibuat Pada</th>
           </tr>
         </thead>
         <tbody>

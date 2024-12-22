@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 
 const Kelas = () => {
   const [courses, setCourses] = useState([]);
+  const location = useLocation();
 
   // Data contoh kelas
   // const kelasTable = [
@@ -69,43 +70,58 @@ const Kelas = () => {
   }, []);
 
   return (
-    <div className="p-4">
-            <h2 className="text-2xl font-bold mb-4 text-gray-700">TABLE KELAS</h2>
-      <div className="mb-4">
-        <Link to="/pengajar/form-kelas" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">
-          Tambah Kelas
-        </Link>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="py-2 px-4 border-b">Nama Kelas</th>
-              <th className="py-2 px-4 border-b">Harga</th>
-              <th className="py-2 px-4 border-b">Format</th>
-              <th className="py-2 px-4 border-b">Jumlah Pengikut</th>
-              <th className="py-2 px-4 border-b">Status</th>
-              {/* <th className="py-2 px-4 border-b">Foto</th> */}
-              <th className="py-2 px-4 border-b">Penyelesaian Siswa</th>
+    <section>
+      <div className="overflow-x-auto p-4">
+        <div className="text-center mb-2">
+          <Link to ="/pengajar/kelas" className={`text-lg font-bold px-2 py-1 ml-4 transition-all duration-200 hover:bg-gray-200 hover:rounded-lg ${
+            location.pathname === "/pengajar/kelas"
+            ? "bg-gray-200 rounded-lg"
+            : "hover:bg-gray-600"
+          }`}
+          >
+            List Kelas
+          </Link>
+          
+          <Link to ="/pengajar/form-kelas" className={`text-lg font-bold px-2 py-1 ml-4 transition-all duration-200 hover:bg-gray-200 hover:rounded-lg ${
+            location.pathname === "/pengajar/form-kelas"
+            ? "bg-gray-200 rounded-lg"
+            : "hover:bg-gray-600"
+          }`}
+          >
+            Tambah Kelas
+          </Link>
+        </div>
+
+      <div className="overflow-x-auto max-w-4xl">
+        <table className="w-full table-auto text-sm">
+          <thead className="bg-[#F1F3F9]">
+            <tr className="text-black">
+              <th className="h-[30px] px-5 rounded-tl-lg">Nama Kelas</th>
+              <th className="px-5 h-[30px]">Harga</th>
+              <th className="px-5 h-[30px]">Format</th>
+              <th className="px-5 h-[30px]">Pengikut</th>
+              <th className="px-5 h-[30px]">Status</th>
+               {/* <th className="py-2 px-4 border-b">Foto</th> */}
+              <th className="h-[30px] px-5 rounded-tr-lg">Penyelesaian</th>
             </tr>
           </thead>
-          <tbody className="text-center">
+          <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
             {courses.map((course) => (
-              <tr key={course.id_course} className="hover:bg-gray-100">
-                <td className="py-2 px-4 border-b">
+              <tr key={course.id_course} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 <Link to={`/pengajar/detail-kelas/${course.id_course}`} className="text-blue-500 hover:underline">
                     {course.course_title}
                   </Link>
                 </td>
-                <td className="py-2 px-4 border-b">{course.paid === false 
+                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">{course.paid === false 
                 ? "Gratis" 
                 : course.price 
                 ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(course.price)
                 : ""}
                 </td>
-                <td className="py-2 px-4 border-b">{course.online ? "Online" : "Offline"}</td>
-                <td className="py-2 px-4 border-b">{course.joined_count}</td>
-                <td className="py-2 px-4 border-b">{course.status_course}</td>
+                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">{course.online ? "Online" : "Offline"}</td>
+                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">{course.joined_count}</td>
+                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">{course.status_course}</td>
                 {/* <td className="py-2 px-4 border-b">
                 {course.image_url ? (
                 <img 
@@ -117,7 +133,7 @@ const Kelas = () => {
                   <span>Tidak ada gambar</span> // Pesan jika gambar tidak tersedia
                 )}
                 </td> */}
-                <td className="py-2 px-4 border-b">
+                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   <div className="relative w-full">
                     <div className="flex items-center">
                       <div className="w-full bg-gray-300 rounded h-2">
@@ -136,6 +152,7 @@ const Kelas = () => {
         </table>
       </div>
     </div>
+    </section>
   );
 };
 

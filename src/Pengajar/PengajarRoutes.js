@@ -8,6 +8,7 @@ import ProfilPengajar from "./ProflePengajar";
 import RiwayatTransaksi from "./RiwayatTransaksi";
 import ProfilePengajar from "./ProflePengajar";
 import DetailKelas from "./DetailKelas";
+import ForumDiskusi from "./ForumDiskusi";
 
 const PengajarRoutes = () =>   {
   return (
@@ -22,7 +23,7 @@ const PengajarRoutes = () =>   {
         <Route path="profile-pengajar" element={< ProfilePengajar />} />
         <Route path="riwayat-transaksi" element={< RiwayatTransaksi />} />
         <Route path="detail-kelas/:id_course" element={<DetailKelas />} />
-    
+        <Route path="forum-diskusi" element={<ForumDiskusi />} />
       
         {/* Tambahkan rute halaman pengajar lain di sini */}
       </Route>

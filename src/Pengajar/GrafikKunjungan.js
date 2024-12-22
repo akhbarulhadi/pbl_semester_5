@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
-const StatistikData = () => {
-  const [state, setState] = useState({
-    data: [20, 60, -20, -60, 20, 40], // Data awal contoh
-  });
-
   const options = {
     legend: {
       show: false, // Tidak perlu legend karena hanya satu dataset
+      position: 'top',
+      horizontalAlign: 'left',
     },
     colors: ["#3C50E0"],
     chart: {
@@ -52,21 +49,17 @@ const StatistikData = () => {
       strokeColors: ["#3056D3"],
       strokeWidth: 3,
       strokeOpacity: 0.9,
+      strokeDashArray: 0,
       fillOpacity: 1,
+      discrete: [],
       hover: {
+        size: undefined,
         sizeOffset: 5,
       },
     },
     xaxis: {
       type: "category",
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "Mai", // Ganti May menjadi Mai
-        "Jun",
-      ],
+      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       axisBorder: {
         show: false,
       },
@@ -75,26 +68,47 @@ const StatistikData = () => {
       },
     },
     yaxis: {
-      min: 0, // Nilai minimum
-      max: 100,  // Nilai maksimum
-      tickAmount: 4, // Jumlah garis pembagi (60, 20, -20, -60)
+      title: {
+        style: {
+          fontSize: '0px',
+        },
+      },
+      min: 0,
+      max: 100,
     },
   };
+
+  const GrafikKunjungan = () => {
+    const [state, setState] = useState({
+      series: [
+        {
+          name: 'Total Pengunjung',
+          data: [80, 40, 80, 40, 80, 40, 80, 40, 80, 40, 80, 40, ],
+        }
+      ], // Data awal contoh
+    });
+
+  const months = ['2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06', '2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12'];
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Contoh fetch data API (simulasi)
-        const res = await fetch("/api/admin/statistik/registered-users").then(
-          (res) => res.json()
-        );
+        const visitorsRes = await Promise.all([
+          fetch('/api/admin/statistik/total-visitors').then(res => res.json()),
+        ]);
 
-        // Simulasi respons API
-        const simulatedData = [20, 60, -20, -60, 20, 40]; // Data diambil dari respons API
+        // Initialize with zeroes for all months
+        const visitorsData = months.map(month => visitorsRes.visitorsPerMonth[month] || 0); // Data diambil dari respons API
 
         // Set data ke state
         setState({
-          data: simulatedData,
+          series: [
+            {
+              name: 'Total Pengunjung',
+              data: visitorsData,
+            },
+          ],
         });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -108,7 +122,7 @@ const StatistikData = () => {
     <div className="col-span-12 rounded-md border border-stroke bg-white p-5 shadow-md">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-gray-800 font-medium">Akun Pengguna</h2>
+        <h2 className="text-gray-800 font-medium">Total Kunjungan</h2>
         <button className="text-gray-600 text-sm focus:outline-none">
           Bulan Ini
         </button>
@@ -117,19 +131,21 @@ const StatistikData = () => {
       {/* Total Data */}
       <div className="mt-4">
         <h1 className="text-3xl font-semibold text-[#127B19]">
-          {state.data.reduce((a, b) => a + b, 0)} Terdaftar
+          {state.series.reduce((a, b) => a + b, 0)} Kunjungan
         </h1>
       </div>
 
       {/* Chart */}
-      <ReactApexChart
-        options={options}
-        series={[{ name: "Akun Terdaftar", data: state.data }]} // Hanya satu dataset
-        type="area"
-        height={350}
-      />
+      <div id="chartOne" className="-ml-5">
+        <ReactApexChart
+          options={options}
+          series={state.series}
+          type="area"
+          height={350}
+        />
+      </div>
     </div>
   );
 };
 
-export default StatistikData;
+export default GrafikKunjungan;

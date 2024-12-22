@@ -5,9 +5,10 @@ import DaftarPengajar from "./DaftarPengajar";
 import RiwayatTransaksi from "./RiwayatTransaksi";
 import FormPengajar from "./FormPengajar";
 import ListPeserta from "./ListPeserta";
-import PersetujuanKelas from "./PersetujuanKelas";
+import PengajuanKelas from "./PengajuanKelas"
 import DetailKelas from "Admin/DetailKelas";
-import PersetujuanPenarikan from "./PersetujuanPenarikan";
+import PengajuanPenarikan from "./PengajuanPenarikan"
+import Kelas from "./Kelas";
 
 const AdminRoutes = () => {
     return (
@@ -19,9 +20,10 @@ const AdminRoutes = () => {
           <Route path="riwayat-transaksi" element={<RiwayatTransaksi />} />
           <Route path="form-pengajar" element={<FormPengajar />} />
           <Route path="list-peserta" element={<ListPeserta />} />
-          <Route path="persetujuan-buka-kelas" element={<PersetujuanKelas />} />
+          <Route path="pengajuan-kelas" element={<PengajuanKelas />} />
           <Route path="detail-kelas/:id_course" element={<DetailKelas />} />
-          <Route path="persetujuan-penarikan" element={<PersetujuanPenarikan />} />
+          <Route path="pengajuan-penarikan" element={<PengajuanPenarikan />} />
+          <Route path="kelas" element={<Kelas />} />
           
           {/* Tambahkan rute halaman lain di sini */}
         </Route>
