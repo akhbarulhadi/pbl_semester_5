@@ -10,16 +10,63 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-router.get("/", async (req, res) => {
+router.get("/", accessControl('Admin'), async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("teacher_withdrawal")
       .select("*")
       .order("status", { ascending: true })
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .eq('status', 'Pending');
 
     if (error) throw error;
     res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+router.get("/pengajuan-dana", accessControl('Admin'), async (req, res) => {
+  try {
+    const { data: withdarwals, error: withdarwalError } = await supabase
+      .from("teacher_withdrawal")
+      .select("*")
+      // .order("status", { ascending: true })
+      .order("created_at", { ascending: false })
+      .in("status", ["Paid", "Cancelled"]);
+
+      if (withdarwalError) throw withdarwalError;
+
+      const userIds = withdarwals.map(withdarwal => withdarwal.id_user_teacher);
+  
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id_user, name')
+        .in('id_user', userIds);
+  
+      if (usersError) throw usersError;
+
+
+      const mergedData = withdarwals.map(withdarwal => {
+        const user = users.find(user => user.id_user === withdarwal.id_user_teacher);
+        return {
+          id_withdraw: withdarwal.id_withdraw,
+          status: withdarwal.status,
+          updated_at: withdarwal.updated_at,
+          user_name: withdarwal.user_name,
+          amount: withdarwal.amount ? withdarwal.amount : 0,
+          bank_name: withdarwal.bank_name,
+          bank_account_number: withdarwal.bank_account_number,
+          bank_account_holder_name: withdarwal.bank_account_holder_name,
+          user_name: user ? user.name : 'Nama tidak ditemukan'
+        };
+      });
+
+      const limitedData = mergedData;
+
+      res.status(200).json(limitedData);
+      
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -102,7 +149,49 @@ router.put('/:id_withdraw', async (req, res) => {
   }
 });
 
+router.get("/dashboard/pengajuan-dana", accessControl('Admin'), async (req, res) => {
+  try {
+    const { data: withdarwals, error: withdarwalError } = await supabase
+      .from("teacher_withdrawal")
+      .select("*")
+      // .order("status", { ascending: true })
+      .order("created_at", { ascending: false })
+      .eq('status', 'Pending');
 
+      if (withdarwalError) throw withdarwalError;
+
+      const userIds = withdarwals.map(withdarwal => withdarwal.id_user_teacher);
+  
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id_user, name')
+        .in('id_user', userIds);
+  
+      if (usersError) throw usersError;
+
+
+      const mergedData = withdarwals.map(withdarwal => {
+        const user = users.find(user => user.id_user === withdarwal.id_user_teacher);
+        return {
+          id_withdraw: withdarwal.id_withdraw,
+          status: withdarwal.status,
+          user_name: withdarwal.user_name,
+          amount: withdarwal.amount ? withdarwal.amount : 0,
+          bank_name: withdarwal.bank_name,
+          bank_account_number: withdarwal.bank_account_number,
+          bank_account_holder_name: withdarwal.bank_account_holder_name,
+          user_name: user ? user.name : 'Nama tidak ditemukan'
+        };
+      });
+
+      const limitedData = mergedData.slice(0, 5);
+
+      res.status(200).json(limitedData);
+      
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // router.post("/", async (req, res) => {
 //   const userId = req.user.id;

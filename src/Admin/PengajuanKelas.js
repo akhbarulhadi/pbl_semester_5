@@ -130,6 +130,7 @@ const PengajuanKelas = () => {
               <th className="py-2 px-3 border-b">Pengajar</th>
               <th className="py-2 px-3 border-b">Judul</th>
               <th className="py-2 px-3 border-b">Deskripsi</th>
+              <th className="py-2 px-3 border-b">Kelas</th>
               <th className="py-2 px-3 border-b">Total Peserta</th>
               <th className="py-2 px-3 border-b">Harga</th>
               <th className="py-2 px-3 border-b">Status</th>
@@ -139,8 +140,8 @@ const PengajuanKelas = () => {
           <tbody>
             {courses.map((course) => (
               <tr key={course.id_course} className="hover:bg-gray-100">
-                <td className="py-2 px-3 border-b">{course.user_name}</td>
-                <td className="py-2 px-3 border-b">
+                <td className="py-2 px-3 border-b text-center">{course.user_name}</td>
+                <td className="py-2 px-3 border-b text-center">
                   <Link
                     to={`/admin/detail-kelas/${course.id_course}`}
                     className="text-blue-500 hover:underline"
@@ -148,10 +149,11 @@ const PengajuanKelas = () => {
                     {course.course_title}
                   </Link>
                 </td>
-                <td className="py-2 px-3 border-b">{course.course_description}</td>
+                <td className="py-2 px-3 border-b text-center">{course.course_description}</td>
                 <td className="py-2 px-3 border-b text-center">
                   {course.online ? "Online" : "Offline"}
                 </td>
+                <td className="py-2 px-3 border-b text-center">{course.join_count} Peserta</td>
                 <td className="py-2 px-3 border-b text-center">
                   {course.paid === false
                     ? "Gratis"

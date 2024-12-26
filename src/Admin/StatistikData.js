@@ -3,7 +3,8 @@ import ReactApexChart from "react-apexcharts";
 
 const StatistikData = () => {
   const [state, setState] = useState({
-    data: [20, 60, -20, -60, 20, 40], // Data awal contoh
+    months: [], // Menyimpan bulan
+    data: [],   // Menyimpan jumlah pengguna per bulan
   });
 
   const options = {
@@ -59,14 +60,7 @@ const StatistikData = () => {
     },
     xaxis: {
       type: "category",
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "Mai", // Ganti May menjadi Mai
-        "Jun",
-      ],
+      categories: state.months, // Menggunakan bulan yang sudah diproses
       axisBorder: {
         show: false,
       },
@@ -76,25 +70,26 @@ const StatistikData = () => {
     },
     yaxis: {
       min: 0, // Nilai minimum
-      max: 100,  // Nilai maksimum
-      tickAmount: 4, // Jumlah garis pembagi (60, 20, -20, -60)
+      max: Math.max(...state.data) + 1,  // Nilai maksimum disesuaikan dengan data
+      tickAmount: 4, // Jumlah garis pembagi
     },
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Contoh fetch data API (simulasi)
-        const res = await fetch("/api/admin/statistik/registered-users").then(
-          (res) => res.json()
-        );
+        // Ambil data dari API
+        const res = await fetch("/api/admin/statistik/total-users");
+        const data = await res.json();
 
-        // Simulasi respons API
-        const simulatedData = [20, 60, -20, -60, 20, 40]; // Data diambil dari respons API
+        // Proses data dari API
+        const months = Object.keys(data.userPerMonth); // Bulan-bulan
+        const userCounts = Object.values(data.userPerMonth); // Jumlah pengguna per bulan
 
         // Set data ke state
         setState({
-          data: simulatedData,
+          months: months,
+          data: userCounts,
         });
       } catch (error) {
         console.error("Error fetching data:", error);

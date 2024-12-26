@@ -1,8 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaHome, FaUser, FaHistory, FaCertificate, FaCog, FaSignOutAlt } from 'react-icons/fa';
 
 function SidebarPengguna() {
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch('/api/auth/profile', {
+          method: 'GET',
+          credentials: 'include', // penting jika menggunakan cookie untuk autentikasi
+        });
+
+        if (!response.ok) {
+          throw new Error('Error: ' + response.statusText);
+        }
+
+        const data = await response.json();
+        setProfileData(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
   const handleLogout = () => {
     fetch('/api/auth/logout', {
       method: 'POST',
@@ -28,8 +56,18 @@ function SidebarPengguna() {
             alt="Profile"
             className="w-16 h-16 rounded-full object-cover shadow-lg border-4 border-white"
           />
-          <h2 className="mt-4 text-xl font-semibold">John Doe</h2>
-          <p className="text-sm text-gray-200">johndoe@example.com</p>
+          {error ? (
+            <div className="text-red-500 font-semibold mt-4">Gagal memuat data profil</div>
+          ) : (
+            <>
+              <h2 className="mt-4 text-xl font-semibold">
+                {loading ? 'Loading...' : profileData?.name || 'Nama Tidak Ditemukan'}
+              </h2>
+              <p className="text-sm text-gray-200">
+                {loading ? 'Memuat email...' : profileData?.email || 'Email Tidak Ditemukan'}
+              </p>
+            </>
+          )}
         </div>
 
         {/* Menu Sidebar */}

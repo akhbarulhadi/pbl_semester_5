@@ -1,11 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const PengaturanU = () => {
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [formData, setFormData] = useState({
     nama: '',
     email: '',
     kataSandi: '',
   });
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch('/api/auth/profile', {
+          method: 'GET',
+          credentials: 'include', // penting jika menggunakan cookie untuk autentikasi
+        });
+
+        if (!response.ok) {
+          throw new Error('Error: ' + response.statusText);
+        }
+
+        const data = await response.json();
+        setProfileData(data);
+        // Isi formData dengan profileData
+        setFormData({
+          nama: data.name || '',
+          email: data.email || '',
+          kataSandi: '', // Kata sandi kosong karena tidak boleh langsung diisi
+        });
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,6 +54,9 @@ const PengaturanU = () => {
     // Tambahkan logika untuk menyimpan perubahan pengaturan
     console.log('Data yang disimpan:', formData);
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="container mx-auto p-4 pl-64">
@@ -77,7 +114,6 @@ const PengaturanU = () => {
         </button>
       </form>
     </div>
-    
   );
 };
 

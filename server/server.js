@@ -22,6 +22,8 @@ const signupTeachersAdminRoutes = require('./routes/admin/signupTeachersRoutes')
 const teacherWithdrawalRoutes = require('./routes/pengajar/withdrawRoutes');
 const adminWithdrawalRoutes = require('./routes/admin/withdrawRoutes');
 
+const certificatePenggunaRoutes = require('./routes/pengguna/certificateRoutes');
+
 const app = express();
 const fs = require('fs');
 
@@ -47,8 +49,13 @@ app.use('/api/admin/signup-teacher', signupTeachersAdminRoutes);
 app.use('/api/pengajar/withdrawal', authMiddleware, teacherWithdrawalRoutes);
 app.use('/api/admin/withdrawal', authMiddleware, adminWithdrawalRoutes);
 
+app.use('/api/pengguna/certificate', authMiddleware, certificatePenggunaRoutes);
+
 app.use('/api/uploads/kelas', express.static(path.join(__dirname, 'uploads/kelas')));
 app.use('/api/uploads/user', express.static(path.join(__dirname, 'uploads/user')));
+app.use('/api/uploads/module', express.static(path.join(__dirname, 'uploads/module')));
+app.use('/api/uploads/soal', express.static(path.join(__dirname, 'uploads/soal')));
+app.use('/api/uploads/tasks', express.static(path.join(__dirname, 'uploads/tasks')));
 
 app.use(useragent.express());
 

@@ -1,15 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ProfilePengajar = () => {
   // State untuk menyimpan data profile
-  const [profile, setProfile] = useState({
-    nama: 'Nama Lengkap',
-    email: 'email@example.com',
-    portofolio: 'https://portofolio.com',
-    noTelp: '08123456789',
-    foto: null, // State untuk menyimpan foto
-  });
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch('/api/auth/profile', {
+          method: 'GET',
+          credentials: 'include', // penting jika menggunakan cookie untuk autentikasi
+        });
+  
+        if (!response.ok) {
+          throw new Error('Error: ' + response.statusText);
+        }
+  
+        const data = await response.json();
+        setProfile(data); // Update state dengan data dari API
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchProfileData();
+  }, []);
+
+  
   // State untuk mode edit
   const [isEditing, setIsEditing] = useState(false);
 
@@ -48,9 +69,9 @@ const ProfilePengajar = () => {
       <h2 className="text-xl font-semibold mb-4 text-center">Profil Pengajar</h2>
 
       <div className="flex flex-col items-center mb-4">
-        {profile.foto ? (
+        {profile && profile.foto ? (
           <img
-            src={profile.foto}
+            src={`/api/${profile.foto}`}
             alt="Foto Pengajar"
             className="w-32 h-32 rounded-full object-cover mb-4 md:w-40 md:h-40 lg:w-48 lg:h-48"
           />
@@ -69,8 +90,7 @@ const ProfilePengajar = () => {
           />
         )}
       </div>
-
-      {['nama', 'email', 'portofolio', 'noTelp'].map((field, index) => (
+      {profile && ['name', 'email', 'portofolio', 'no_telp'].map((field, index) => (
         <div className="mb-4" key={index}>
           <label className="block text-gray-700 font-medium mb-2 capitalize">{field.replace(/([A-Z])/g, ' $1')}</label>
           {isEditing ? (
@@ -94,7 +114,6 @@ const ProfilePengajar = () => {
           )}
         </div>
       ))}
-
       {isEditing ? (
         <button
           onClick={handleSave}

@@ -101,9 +101,10 @@ const Home = () => {
                 }}
                 onClick={() =>
                   window.location.href =
-                    course.joined_users.length === 0
-                      ? `/pengguna/KursusDetail/${course.id_course}`
-                      : `/pengguna/kursus/${course.id_course}`
+                  //   course.joined_users.length === 0
+                  // //     ? `/pengguna/KursusDetail/${course.id_course}`
+                  //     : `/pengguna/kursus/${course.id_course}`
+                  `/pengguna/KursusDetail/${course.id_course}` 
                 }
               >
                 <img
@@ -129,26 +130,53 @@ const Home = () => {
                     className="text-green-500 font-bold"
                     style={{ fontSize: '12px' }}
                   >
-                    {course.paid === false
+                    {/* {course.paid === false
                       ? 'Gratis'
                       : course.joined_users.length === 0
                       ? `Rp ${course.price}`
-                      : 'Sudah dibeli'}
+                      : 'Sudah dibeli'} */}
+                      {course.paid === false
+                      ? 'Gratis'
+                      : `Rp ${course.price}`}
                   </span>
                 </div>
                 {/* Bintang */}
-                <div className="absolute bottom-2 right-2 flex items-center space-x-1 bg-white p-1 ">
-                  {[1, 2, 3, 4, 5].map((star, idx) => (
-                    <svg
-                      key={idx}
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill={idx < course.rating ? 'gold' : 'gray'}
-                    >
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01z" />
-                    </svg>
-                  ))}
+                <div className="absolute bottom-2 right-2 flex items-center space-x-1 bg-white p-1">
+                  {[1, 2, 3, 4, 5].map((star, idx) => {
+                    const rating = course.average_rating || 0; // Pastikan rating ada, default 0
+                    let fillColor;
+                  
+                    if (idx + 1 <= Math.floor(rating)) {
+                      // Bintang penuh
+                      fillColor = "gold";
+                    } else if (idx < rating) {
+                      // Bintang sebagian
+                      fillColor = "url(#half-gradient)";
+                    } else {
+                      // Bintang kosong
+                      fillColor = "gray";
+                    }
+                  
+                    return (
+                      <svg
+                        key={idx}
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill={fillColor}
+                      >
+                        {/* Definisi gradient untuk bintang sebagian */}
+                        <defs>
+                          <linearGradient id="half-gradient">
+                            <stop offset={`${(rating % 1) * 100}%`} stopColor="gold" />
+                            <stop offset={`${(rating % 1) * 100}%`} stopColor="gray" />
+                          </linearGradient>
+                        </defs>
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01z" />
+                      </svg>
+                    );
+                  })}
+                  <p>({course.course_ratings.length})</p>
                 </div>
               </div>
             ))}

@@ -10,11 +10,11 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-router.get('/', async (req, res) => {
+router.get('/', accessControl('Admin'), async (req, res) => {
   try {
     const { data: courses, error: coursesError } = await supabase
       .from('courses')
-      .select('*');
+      .select('*, join_courses(id_course)');
 
     if (coursesError) throw coursesError;
 
@@ -31,6 +31,7 @@ router.get('/', async (req, res) => {
       const user = users.find(user => user.id_user === course.id_user);
       return {
         ...course,
+        join_count: course.join_courses.length,
         user_name: user ? user.name : 'Nama tidak ditemukan'
       };
     });
@@ -169,6 +170,77 @@ router.get('/:id_course', async (req, res) => {
   }
 });
 
+router.get('/dashboard/top-courses', accessControl('Admin'), async (req, res) => {
+  try {
+    // Query untuk mengambil data courses beserta join_courses
+    const { data: courses, error: coursesError } = await supabase
+      .from('courses')
+      .select('id_course, course_title, price, paid, join_courses(id_course)')
+      .eq("status_course", "Activated"); // Filter hanya course yang diaktifkan
 
+    if (coursesError) {
+      return res.status(400).json({ error: 'Error fetching courses: ' + coursesError.message });
+    }
+
+    // Hitung jumlah join_courses per course
+    const courseJoinCounts = courses.map(course => ({
+      id_course: course.id_course,
+      course_title: course.course_title,
+      price: course.price ? course.price : 0,
+      paid: course.paid,
+      join_count: course.join_courses.length,
+    }));
+
+    // Urutkan courses berdasarkan join_count dari besar ke kecil
+    const sortedCourses = courseJoinCounts.sort((a, b) => b.join_count - a.join_count);
+
+    // Ambil course dengan jumlah join_courses terbanyak (misalnya, hanya 1)
+    const topCourses = sortedCourses.slice(0, 5); // Slice untuk mendapatkan hanya top course
+
+    return res.status(200).json(topCourses); // Kembalikan data course yang paling banyak di-join
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error: ' + error.message });
+  }
+});
+
+router.get('/dashboard/pengajuan-courses', accessControl('Admin'), async (req, res) => {
+  try {
+    const { data: courses, error: coursesError } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('status_course', 'Pending');
+
+    if (coursesError) throw coursesError;
+
+    const userIds = courses.map(course => course.id_user);
+
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('id_user, name')
+      .in('id_user', userIds);
+
+    if (usersError) throw usersError;
+
+    const mergedData = courses.map(course => {
+      const user = users.find(user => user.id_user === course.id_user);
+      return {
+        id_course: course.id_course,
+        course_title: course.course_title,
+        price: course.price ? course.price : 0,
+        paid: course.paid,
+        status_course: course.status_course,
+        user_name: user ? user.name : 'Nama tidak ditemukan'
+      };
+    });
+    
+    const limitedData = mergedData.slice(0, 5);
+
+    res.status(200).json(limitedData);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Terjadi kesalahan saat mengambil data courses dan users.' });
+  }
+});
 
 module.exports = router;

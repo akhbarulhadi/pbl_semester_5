@@ -52,6 +52,8 @@ const DashboardPengajar = () => {
   const [totalUser, setTotalUser] = useState(0);
   const [totalKelas, setTotalKelas] = useState(0);
   const [balance, setBalance] = useState(0);
+  const [rating, setRating] = useState(0); // Nilai awal 0
+
 
 
   useEffect(() => {
@@ -116,6 +118,7 @@ const DashboardPengajar = () => {
         setTotalUser(data.total_unique_joined_users);
         setTotalJoinedCount(data.total_joined_users);
         setBalance(data.balance[0].balance);
+        setRating(data.rating);
       })
       .catch((error) => console.error('Fetch error:', error));
   }, []);
@@ -147,7 +150,7 @@ const DashboardPengajar = () => {
 
           <DataIncome
             title="Rating Saya"
-            total={renderStars(4)}>
+            total={renderStars(rating)}>
           </DataIncome>
 
         
@@ -172,18 +175,7 @@ const DashboardPengajar = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="px-4 py-2 text-gray-700">Erling Haaland</td>
-                  <td className="px-4 py-2 text-gray-700">"..........."</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-2 text-gray-700">Pedro Perro</td>
-                  <td className="px-4 py-2 text-gray-700">"..........."</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-2 text-gray-700">Dani Carvajal</td>
-                  <td className="px-4 py-2 text-gray-700">"..........."</td>
-                </tr>
+                  <td className="px-4 py-2 text-gray-700"><a href="/pengajar/forum-diskusi" className="hover:text-blue-600">Lihat Selengkapnya</a></td>
               </tbody>
             </table>
           </div>

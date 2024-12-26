@@ -29,19 +29,19 @@ const ProfilePage = () => {
     fetchProfileData();
   }, []);
 
-  const handleLogout = () => {
-    fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Logout failed. Status: ${response.status}`);
-        }
-        window.location.href = '/';
-      })
-      .catch((error) => console.error('Logout error:', error));
-  };
+  // const handleLogout = () => {
+  //   fetch('/api/auth/logout', {
+  //     method: 'POST',
+  //     credentials: 'include',
+  //   })
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error(`Logout failed. Status: ${response.status}`);
+  //       }
+  //       window.location.href = '/';
+  //     })
+  //     .catch((error) => console.error('Logout error:', error));
+  // };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;

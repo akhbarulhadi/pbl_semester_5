@@ -33,7 +33,7 @@ const RiwayatTransaksi = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        let response = await fetch('/api/pengajar/courses/list-transactions', {
+        let response = await fetch('/api/pengajar/courses/pengajuan-dana', {
           method: 'GET',
           credentials: 'include',
         });
@@ -47,7 +47,7 @@ const RiwayatTransaksi = () => {
   
           if (refreshResponse.ok) {
             // Coba ulang fetch courses setelah token diperbarui
-            response = await fetch('/api/pengajar/courses/list-transactions', {
+            response = await fetch('/api/pengajar/courses/pengajuan-dana', {
               method: 'GET',
               credentials: 'include',
             });
@@ -77,12 +77,10 @@ const RiwayatTransaksi = () => {
       <table className="w-full table-auto text-sm">
         <thead>
           <tr className="bg-gray-200">
-            <th className="h-[30px] px-5 rounded-tl-lg font-semibold text-gray-700">ID Transaksi</th>
-            <th className="h-[30px] px-5 font-semibold text-gray-700">Kursus</th>
-            <th className="h-[30px] px-5 font-semibold text-gray-700">Pengajar</th>
-            <th className="h-[30px] px-5 font-semibold text-gray-700">Pengguna</th>
-            <th className="h-[30px] px-5 font-semibold text-gray-700">Metode Pembayaran</th>
-            <th className="h-[30px] px-5 font-semibold text-gray-700">Status Pembayaran</th>
+            <th className="h-[30px] px-5 rounded-tl-lg font-semibold text-gray-700">Nama Pemilik Rekening</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Bank</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Nomor Rekening</th>
+            <th className="h-[30px] px-5 font-semibold text-gray-700">Status Penarikan</th>
             <th className="h-[30px] px-5 font-semibold text-gray-700">Harga</th>
             <th className="h-[30px] px-5 font-semibold text-gray-700">Tanggal Pembayaran</th>
             <th className="h-[30px] px-5 rounded-tr-lg font-semibold text-gray-700">Dibuat Pada</th>
@@ -90,20 +88,18 @@ const RiwayatTransaksi = () => {
         </thead>
         <tbody>
           {transactions.map((transaction) => (
-              <tr key={transaction.id_user_payment_courses} className="hover:bg-gray-100 transition-colors duration-200">
-              <td className="py-2 px-4 border-b border-gray-300">{transaction.transaction_id}</td>
-              <td className="py-2 px-4 border-b border-gray-300">{transaction.course_title}</td>
-              <td className="py-2 px-4 border-b border-gray-300">{transaction.teacher_name}</td>
-              <td className="py-2 px-4 border-b border-gray-300">{transaction.user_name}</td>
-              <td className="py-2 px-4 border-b border-gray-300">{transaction.payment_method}</td>
+              <tr key={transaction.id_withdraw} className="hover:bg-gray-100 transition-colors duration-200">
+              <td className="py-2 px-4 border-b border-gray-300">{transaction.bank_account_holder_name}</td>
+              <td className="py-2 px-4 border-b border-gray-300">{transaction.bank_name}</td>
+              <td className="py-2 px-4 border-b border-gray-300">{transaction.bank_account_number}</td>
               <td className={`py-2 px-4 border-b border-gray-300 
-                ${transaction.payment_status === 'paid' ? 'text-green-600' : 
-                   transaction.payment_status === 'pending' ? 'text-yellow-600' : 'text-red-600'}`}>
-                {transaction.payment_status === 'paid' ? 'Sukses' : 
-                 transaction.payment_status === 'pending' ? 'Tertunda' : 'Gagal'}
+                ${transaction.status === 'Paid' ? 'text-green-600' : 
+                   transaction.status === 'Pending' ? 'text-yellow-600' : 'text-red-600'}`}>
+                {transaction.status === 'Paid' ? 'Sukses' : 
+                 transaction.status === 'Pending' ? 'Tertunda' : 'Gagal'}
               </td>
-              <td className="py-2 px-4 border-b border-gray-300">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transaction.price)}</td>
-              <td className="py-2 px-4 border-b border-gray-300">{transaction.payment_date ? new Date(transaction.payment_date).toLocaleDateString() : 'Tanggal tidak tersedia'}</td>
+              <td className="py-2 px-4 border-b border-gray-300">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(transaction.amount)}</td>
+              <td className="py-2 px-4 border-b border-gray-300">{transaction.updated_at ? new Date(transaction.updated_at).toLocaleDateString() : 'Tanggal tidak tersedia'}</td>
               <td className="py-2 px-4 border-b border-gray-300">{new Date(transaction.created_at).toLocaleDateString()}</td>
             </tr>
           ))}

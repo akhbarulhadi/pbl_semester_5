@@ -114,7 +114,7 @@ const KursusDetail = () => {
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 21v-2a4 4 0 00-4-4 4 4 0 00-4 4v2m6-6a6 6 0 016 6m-6-6a6 6 0 00-6 6" />
                   </svg>
-                  <span>{Array.isArray(course.joined_users) ? course.joined_users.length : 0} peserta</span>
+                  <span>{course.total_users} peserta</span>
                 </div>
               </div>
 
@@ -151,7 +151,7 @@ const KursusDetail = () => {
             {/* Deskripsi Kelas (2/3 lebar layar) */}
             <div className="md:col-span-2">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Deskripsi Kelas</h2>
-              <p className="text-lg text-gray-700 mb-6">{course.full_description}</p>
+              <p className="text-lg text-gray-700 mb-6">{course.course_description}</p>
             </div>
 
             {/* Tahapan Pelatihan (1/3 lebar layar) */}
@@ -165,13 +165,13 @@ const KursusDetail = () => {
               </button>
               {showSpoiler && (
                 <div className="space-y-6">
-                  {[{ title: 'Menonton video dari mentor' }, { title: 'Live zoom dan berdiskusi dengan mentor' }, { title: 'Mengerjakan tugas yang diberikan mentor' }, { title: 'Evaluasi pembelajaran' }].map((step, index) => (
+                  {course.modules.map((module, index) => (
                     <div key={index} className="flex items-start bg-gray-100 p-4 rounded-lg shadow-md">
                       <div className="flex-shrink-0 w-10 h-10 bg-green-500 text-white flex items-center justify-center rounded-full text-xl font-bold mr-4">
                         {index + 1}
                       </div>
                       <div>
-                        <h4 className="text-lg font-semibold text-gray-800">{step.title}</h4>
+                      <h4 className="text-lg font-semibold text-gray-800">{module.header}</h4>
                       </div>
                     </div>
                   ))}
@@ -189,12 +189,12 @@ const KursusDetail = () => {
             <div className="md:col-span-2">
               <h3 className="text-2xl font-bold text-gray-800 mb-4">Keuntungan</h3>
               <ul className="list-none space-y-4">
-                {['E-Sertifikat', 'Live melalui Zoom & kesempatan tanya jawab bersama expert', 'Mengerjakan mini task untuk meningkatkan skill'].map((benefit, index) => (
+              {course.benefit_course.map((benefit, index) => (
                   <li key={index} className="flex items-start">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6 text-green-500 flex-shrink-0 mr-3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-gray-700 text-lg">{benefit}</span>
+                    <span className="text-gray-700 text-lg">{benefit.benefit}</span>
                   </li>
                 ))}
               </ul>
@@ -209,7 +209,7 @@ const KursusDetail = () => {
                   className="w-24 h-24 rounded-full object-cover mr-6"
                 />
                 <div>
-                  <h4 className="text-xl font-bold text-gray-800">{course.mentor?.name || 'Nama Mentor Tidak Tersedia'}</h4>
+                  <h4 className="text-xl font-bold text-gray-800">{course.user?.name || 'Nama Mentor Tidak Tersedia'}</h4>
                   <p className="text-gray-600 mb-2">{course.mentor?.description || 'Deskripsi Mentor Tidak Tersedia'}</p>
                   <div className="flex items-center">
                     {Array(5).fill(0).map((_, i) => (

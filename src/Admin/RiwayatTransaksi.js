@@ -10,7 +10,7 @@ const RiwayatTransaksi = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        let response = await fetch("/api/admin/courses/list-transactions", {
+        let response = await fetch("/api/admin/withdrawal/pengajuan-dana", {
           method: "GET",
           credentials: "include",
         });
@@ -23,7 +23,7 @@ const RiwayatTransaksi = () => {
           });
 
           if (refreshResponse.ok) {
-            response = await fetch("/api/admin/courses/list-transactions", {
+            response = await fetch("/api/admin/withdrawal/pengajuan-dana", {
               method: "GET",
               credentials: "include",
             });
@@ -99,10 +99,9 @@ const RiwayatTransaksi = () => {
             <th className="h-[30px] px-5 ">Nama Pemilik Bank</th>
             <th className="h-[30px] px-5 ">Nama Bank</th>
             <th className="h-[30px] px-5 ">No Rekening</th>
-            <th className="h-[30px] px-5 ">Saldo Awal</th>
-            <th className="h-[30px] px-5 ">Pengajuan Dana</th>
-            <th className="h-[30px] px-5 ">Saldo Akhir</th>
-            <th className="h-[30px] px-5 ">Status</th>
+            <th className="h-[30px] px-5 ">Status Pengajuan</th>
+            <th className="h-[30px] px-5 ">Dana Penarikan</th>
+            <th className="h-[30px] px-5 ">Tanggal</th>
             <th className="h-[30px] px-5 rounded-tr-lg">Bukti Transfer</th>   
             </tr>
           </thead>
@@ -110,44 +109,41 @@ const RiwayatTransaksi = () => {
             {transactions.length > 0 ? (
               transactions.map((transaction) => (
                 <tr
-                  key={transaction.id_user_payment_courses}
+                  key={transaction.id_withdraw}
                   className="hover:bg-gray-100 transition-colors duration-200 overflow-x-auto"
                 >
-                  <td className="py-2 px-2 truncate">
-                    {transaction.transaction_id}
-                  </td>
-                  <td className="py-2 px-2 truncate">
-                    {transaction.course_title}
-                  </td>
-                  <td className="py-2 px-2 truncate">
-                    {transaction.teacher_name}
-                  </td>
                   <td className="py-2 px-2 truncate">
                     {transaction.user_name}
                   </td>
                   <td className="py-2 px-2 truncate">
-                    {transaction.payment_method}
+                    {transaction.bank_account_holder_name}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                    {transaction.bank_name}
+                  </td>
+                  <td className="py-2 px-2 truncate">
+                    {transaction.bank_account_number}
                   </td>
                   <td
                     className={`py-2 px-2 truncate ${getStatusClass(
-                      transaction.payment_status
+                      transaction.status
                     )}`}
                   >
-                    {transaction.payment_status === "paid"
+                    {transaction.status === "Paid"
                       ? "Sukses"
-                      : transaction.payment_status === "pending"
-                      ? "Tertunda"
-                      : "Gagal"}
+                      : transaction.status === "Cancelled"
+                      ? "Gagal"
+                      : "Tertunda"}
                   </td>
                   <td className="py-2 px-2 truncate">
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",
-                    }).format(transaction.price)}
+                    }).format(transaction.amount)}
                   </td>
                   <td className="py-2 px-2 truncate">
-                    {transaction.payment_date
-                      ? new Date(transaction.payment_date).toLocaleDateString(
+                    {transaction.updated_at
+                      ? new Date(transaction.updated_at).toLocaleDateString(
                           "id-ID"
                         )
                       : "Tanggal tidak tersedia"}

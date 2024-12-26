@@ -10,7 +10,7 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-router.get("/", async (req, res) => {
+router.get("/", accessControl('Student'), async (req, res) => {
   const userId = req.user.id;
 
   try {
@@ -73,18 +73,20 @@ router.get("/", async (req, res) => {
 });
 
 
-router.get("/semua-kursus", async (req, res) => {
+router.get("/semua-kursus", accessControl('Student'), async (req, res) => {
   const userId = req.user.id;
 
   try {
+    // Ambil data kursus beserta rating
     const { data: courses, error: coursesError } = await supabase
       .from("courses")
-      .select("*")
+      .select("*, course_ratings(rating)")
       .order("id_course", { ascending: false })
       .eq("status_course", "Activated");
 
     if (coursesError) throw coursesError;
 
+    // Ambil data kursus yang diikuti user
     const { data: joinCourses, error: joinCoursesError } = await supabase
       .from("join_courses")
       .select("*")
@@ -92,11 +94,30 @@ router.get("/semua-kursus", async (req, res) => {
 
     if (joinCoursesError) throw joinCoursesError;
 
-    const result = courses.map(course => {
-      const joined = joinCourses.filter(join => join.id_course === course.id_course);
+    // Buat array berisi id_course dari kursus yang diikuti user
+    const joinedCourseIds = joinCourses.map(join => join.id_course);
+
+    // Filter kursus yang belum diikuti user
+    const unjoinedCourses = courses.filter(
+      course => !joinedCourseIds.includes(course.id_course)
+    );
+
+    // Olah data kursus untuk menambahkan joined_users dan rata-rata rating
+    const result = unjoinedCourses.map(course => {
+      // const joined = joinCourses.filter(join => join.id_course === course.id_course);
+      
+      // Hitung rata-rata rating dari course_ratings
+      const ratings = course.course_ratings.map(r => r.rating);
+      const totalRatings = ratings.length; // Total jumlah rating
+      const averageRating = ratings.length
+        ? Math.min(ratings.reduce((sum, rating) => sum + rating, 0) / totalRatings, 5)
+        : null; // Jika tidak ada rating, set null
+
       return {
         ...course,
-        joined_users: joined.map(join => join.id_user),
+        // joined_users: joined.map(join => join.id_user),
+        total_ratings: totalRatings, // Tambahkan total jumlah rating
+        average_rating: averageRating, // Tambahkan rata-rata rating
       };
     });
 
@@ -210,7 +231,7 @@ router.delete("/:id_course", async (req, res) => {
 // * ini menampilkan kursus yang sudah di bayar(unutk detail)
 router.get("/:id_course", async (req, res) => {
   const { id_course } = req.params;
-  const userId = req.user.id;
+  const userId = req.user.id;  // Dapatkan id_user dari request
 
   try {
     const { data: paymentData, error: paymentError } = await supabase
@@ -227,7 +248,7 @@ router.get("/:id_course", async (req, res) => {
 
     const { data: courseData, error: courseError } = await supabase
       .from("courses")
-      .select("*, modules(*)")
+      .select("*, modules(*, quiz(soal, foto_soal, a, b, c, d))") // Jangan lupa ambil quiz
       .eq("id_course", id_course)
       .single();
 
@@ -238,11 +259,11 @@ router.get("/:id_course", async (req, res) => {
       courseData.modules.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     }
 
-    // Ambil data modul yang sudah dibuka oleh user
+    // Ambil data modul yang sudah dibuka oleh user berdasarkan id_user
     const { data: openedModules, error: openedError } = await supabase
       .from("user_opened_modules")
-      .select("id_modules")
-      .eq("id_user", userId);
+      .select("id_modules, correct_answers, wrong_answers, total_questions, submit_quiz_date")
+      .eq("id_user", userId); // Menambahkan filter id_course jika perlu
 
     if (openedError) throw openedError;
 
@@ -252,8 +273,43 @@ router.get("/:id_course", async (req, res) => {
       courseData.modules = courseData.modules.map((module) => ({
         ...module,
         isOpened: openedModuleIds.includes(module.id_modules), // Tandai apakah modul sudah dibuka
+        userQuizData: openedModules.find((openedModule) => openedModule.id_modules === module.id_modules) // Menambahkan data quiz dari user
       }));
     }
+
+    // Ambil data tugas yang diupload oleh user berdasarkan id_user
+    const { data: uploadedTaskData, error: uploadError } = await supabase
+      .from("upload_task_user")
+      .select("id_modules, file_task")
+      .eq("id_user", userId)
+      .eq("id_course", id_course); // Menambahkan filter id_course jika perlu
+
+    if (uploadError) throw uploadError;
+
+    // Tambahkan data upload tugas ke modul
+    if (courseData && courseData.modules) {
+      courseData.modules = courseData.modules.map((module) => {
+        const uploadedTask = uploadedTaskData.find((task) => task.id_modules === module.id_modules);
+        return {
+          ...module,
+          uploadedTask: uploadedTask ? uploadedTask.file_task : null, // Menambahkan data tugas
+        };
+      });
+    }
+
+    // Hitung jumlah user yang bergabung dengan kursus ini
+    const { data: joinCountData, error: joinCountError } = await supabase
+      .from("join_courses")
+      .select("id_user")
+      .eq("id_course", id_course);
+
+    if (joinCountError) throw joinCountError;
+
+    // Hitung jumlah user
+    const joinCount = joinCountData ? joinCountData.length : 0;
+
+    // Tambahkan jumlah user yang bergabung ke dalam response
+    courseData.joinCount = joinCount;
 
     res.status(200).json(courseData);
   } catch (error) {
@@ -315,7 +371,7 @@ router.get("/willpay/:id_course", async (req, res) => {
     if (courseData) {
       const { data: modulesData, error: modulesError } = await supabase
         .from("modules")
-        .select("header")
+        .select("header, type_module")
         .eq("id_courses", id_course);
 
       if (modulesError) throw modulesError;
@@ -329,11 +385,32 @@ router.get("/willpay/:id_course", async (req, res) => {
 
       if (userError) throw userError;
 
+
+      // Count number of users in join_courses for the specific course
+      const { data: countData, error: countError } = await supabase
+        .from("join_courses")
+        .select("id_user", { count: "exact" })
+        .eq("id_course", id_course);
+
+      if (countError) throw countError;
+
+      const userCount = countData.length; // Count of users
+
+      // ambil benefit tabel bedasarkan id_course
+      const { data: benefitData, error: benefitError } = await supabase
+        .from("benefit_course")
+        .select("benefit")
+        .eq("id_course", id_course);
+
+      if (benefitError) throw benefitError;
+
       // Combine course, modules, and user data
       const result = {
         ...courseData,
+        benefit_course:benefitData,
         modules: modulesData,
         user: userData, // Add user data to the result
+        total_users: userCount, // Add user count to the result
       };
 
       res.status(200).json(result);

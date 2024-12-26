@@ -1,9 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, Link } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import profile from "../assets/images/jenggot.png";
 
 const PengajarLayout = () => {
+
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch('/api/auth/profile', {
+          method: 'GET',
+          credentials: 'include', // penting jika menggunakan cookie untuk autentikasi
+        });
+
+        if (!response.ok) {
+          throw new Error('Error: ' + response.statusText);
+        }
+
+        const data = await response.json();
+        setProfileData(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+
   return (
     <div className="relative min-h-screen">
         {/* Sidebar dan Konten */}
@@ -25,7 +55,7 @@ const PengajarLayout = () => {
                   <Link to="/pengajar/profile-pengajar">
                     <div className="text-sm">
                       <p className="font-semibold">Pengajar</p>
-                      <p className="text-gray-500">Charles Magnussen</p>
+                      <p className="text-gray-500">{profileData?.name || 'Nama Tidak Ditemukan'}</p>
                     </div>
                   </Link>
                 </div>
