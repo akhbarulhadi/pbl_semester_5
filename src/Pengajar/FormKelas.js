@@ -6,8 +6,11 @@ const FormKelas = () => {
   const location = useLocation();
   const [isOn, setIsOn] = useState(false);
   const [modules, setModules] = useState([
-    { file_module: "", linkVideoYoutube: "", header: "", inputType: "youtube" },
+    { file_module: "", linkVideoYoutube: "", soal: "", header: "", inputType: "youtube" },
   ]);
+  const [quiz, setQuiz] = useState([
+    { question: "", a: "", b: "", c: "", d: "", answer: "a", file: null },
+  ]); 
   const [benefit, setBenefit] = useState([
     { benefit: "" },
   ]);
@@ -21,8 +24,26 @@ const FormKelas = () => {
     online: false,
     locationOffline: "",
     preOrderOfflineDate: "",
-    category: "",
+    category: "Iphone",
   });
+  const [quizTitle, setQuizTitle] = useState("");
+  const [isQuizVisible, setIsQuizVisible] = useState(false);
+  const handleCheckboxChange = (e) => {
+    setIsQuizVisible(e.target.checked);
+  };
+  const handleQuizChange = (index, key, value) => {
+    const updatedQuiz = [...quiz];
+    updatedQuiz[index][key] = value;
+    setQuiz(updatedQuiz);
+  };
+  
+  const addQuiz = () => {
+    setQuiz([...quiz, { question: "", a: "", b: "", c: "", d: "", answer: "a", file: null }]);
+  };
+  
+  const removeQuiz = (index) => {
+    setQuiz(quiz.filter((_, i) => i !== index));
+  };
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFileModule, setSelectedFileModule] = useState(null);
@@ -39,8 +60,10 @@ const FormKelas = () => {
   useEffect(() => {
     const savedFormData = localStorage.getItem("formData");
     const savedModules = localStorage.getItem("modules");
-    const savedIsOn = localStorage.getItem("isOn"); // Tambahkan untuk isOn
+    const savedIsOn = localStorage.getItem("isOn"); 
     const savedBenefit = localStorage.getItem("benefit");
+    const savedQuiz = localStorage.getItem("quiz");
+    const savedQuizTitle = localStorage.getItem("quizTitle");
 
     if (savedFormData) {
       setFormData(JSON.parse(savedFormData));
@@ -50,6 +73,12 @@ const FormKelas = () => {
     }
     if (savedModules) {
       setModules(JSON.parse(savedModules));
+    }
+    if (savedQuiz) {
+      setQuiz(JSON.parse(savedQuiz));
+    }
+    if (savedQuizTitle) {
+      setQuizTitle(JSON.parse(savedQuizTitle));
     }
     if (savedIsOn !== null) {
       setIsOn(JSON.parse(savedIsOn));
@@ -61,8 +90,10 @@ const FormKelas = () => {
     localStorage.setItem("formData", JSON.stringify(formData));
     localStorage.setItem("benefit", JSON.stringify(benefit));
     localStorage.setItem("modules", JSON.stringify(modules));
+    localStorage.setItem("quiz", JSON.stringify(quiz));
+    localStorage.setItem("quizTitle", JSON.stringify(quizTitle));
     localStorage.setItem("isOn", JSON.stringify(isOn));
-  }, [formData, modules, benefit, isOn]);
+  }, [formData, modules, benefit, quiz, quizTitle, isOn]);
 
   const handleToggle = () => {
     setIsOn(!isOn);
@@ -139,6 +170,7 @@ const FormKelas = () => {
     formDataToSend.append("locationOffline", formData.locationOffline);
     formDataToSend.append("preOrderOfflineDate", formData.preOrderOfflineDate);
     formDataToSend.append("category", formData.category);
+    formDataToSend.append("quizTitle", quizTitle);
 
     if (selectedFile) {
       formDataToSend.append("file", selectedFile); // Menambahkan file foto
@@ -164,6 +196,10 @@ const FormKelas = () => {
       formDataToSend.append("benefit", JSON.stringify(benefit));
     }
 
+    if (quiz.length > 0) {
+      formDataToSend.append("quiz", JSON.stringify(quiz));
+    }  
+
     const confirm = window.confirm(
       "Apakah anda yakin ingin memasukkan data nya!, Direkomendasikan untuk melihat ulang!"
     );
@@ -180,6 +216,8 @@ const FormKelas = () => {
         localStorage.removeItem("formData");
         localStorage.removeItem("benefit");
         localStorage.removeItem("modules");
+        localStorage.removeItem("quiz");
+        localStorage.removeItem("quizTitle");
         localStorage.removeItem("isOn");
         navigate("/pengajar/kelas");
       } else {
@@ -317,12 +355,12 @@ const FormKelas = () => {
           onChange={handleInputChange}
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >       
-            <option>IPhone</option>
-            <option>Macbook</option>
-            <option>IMac</option>
-            <option>IWatch</option>
-            <option>Ipad</option>
-            <option>Airpods</option>
+            <option value="Iphone">IPhone</option>
+            <option value="Macbook">Macbook</option>
+            <option value="Imac">IMac</option>
+            <option value="Iwatch">IWatch</option>
+            <option value="Ipad">IPad</option>
+            <option value="Airpods">Airpods</option>
           </select>
         </div>
         {benefit.map((benefits, index) => (
@@ -397,23 +435,10 @@ const FormKelas = () => {
         {isOn && (
           <>
         <p className="text-xl text-gray-900 font-extralight dark:text-white">
-          Modul
+          Pilih Modul atau Latihan
         </p>
         {modules.map((module, index) => (
             <div key={index} className="mb-6 mt-4">
-              <p>Module {index + 1}</p>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={module.header}
-                  onChange={(e) =>
-                    handleModuleChange(index, "header", e.target.value)
-                  }
-                  placeholder="Judul Module"
-                  className="border p-2 rounded-lg w-full"
-                  required
-                />
-              </div>
                 
               {/* Tombol Pilihan Input */}
               <div className="flex space-x-4 mt-2">
@@ -439,11 +464,39 @@ const FormKelas = () => {
                 >
                   <img src="https://img.icons8.com/fluency/2x/pdf.png" width="32px" height="32px"></img>
                 </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleModuleChange(index, "inputType", "essay")
+                  }
+                  className={`px-4 py-2 rounded-lg ${
+                    module.inputType === "essay" ? "bg-blue-500 text-white" : "bg-gray-300"
+                  }`}
+                >
+                  <img src="https://img.icons8.com/?size=100&id=s9Kx8COBW2pl&format=png&color=000000" width="32px" height="32px"></img>
+                </button>
               </div>
                 
               {/* Input Berdasarkan Pilihan */}
               {module.inputType === "youtube" && (
                 <div className="mt-4">
+                  <p className="text-xl text-gray-900 mb-2 font-extralight dark:text-white">
+                    Modul Video
+                  </p>
+                  <p>Judul Modul {index + 1}</p>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={module.header}
+                      onChange={(e) =>
+                        handleModuleChange(index, "header", e.target.value)
+                      }
+                      placeholder="Judul Module"
+                      className="border p-2 rounded-lg w-full"
+                      required
+                    />
+                  </div>
+                  <p>Module {index + 1}</p>
                   <input
                     type="text"
                     value={module.linkVideoYoutube}
@@ -455,10 +508,26 @@ const FormKelas = () => {
                     required
                   />
                 </div>
-              )}
-          
+              )} 
               {module.inputType === "file" && (
                 <div className="mt-4">
+                  <p className="text-xl text-gray-900 mb-2 font-extralight dark:text-white">
+                    Modul PDF
+                  </p>
+                  <p>Judul Modul {index + 1}</p>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={module.header}
+                      onChange={(e) =>
+                        handleModuleChange(index, "header", e.target.value)
+                      }
+                      placeholder="Judul Module"
+                      className="border p-2 rounded-lg w-full"
+                      required
+                    />
+                  </div>
+                  <p>Modul PDF {index + 1}</p>
                   <input
                     className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                     aria-describedby="file_input_help"
@@ -467,14 +536,43 @@ const FormKelas = () => {
                     name={`file_module_${index}`} // Pastikan name sesuai dengan format yang diharapkan
                     required
                   />
-
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                      PDF (MAX. 50MB).
+                    </p>
+                </div>
+              )}
+              {module.inputType === "essay" && (
+                <div className="mt-4">
+                  <p className="text-xl text-gray-900 mb-2 font-extralight dark:text-white">
+                    Tugas Latihan PDF
+                  </p>
+                  <p>Judul Tugas {index + 1}</p>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      value={module.header}
+                      onChange={(e) =>
+                        handleModuleChange(index, "header", e.target.value)
+                      }
+                      placeholder="Judul Tugas"
+                      className="border p-2 rounded-lg w-full"
+                      required
+                    />
+                  </div>
+                  <p>Tugas PDF {index + 1}</p>
+                  <input
+                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                    aria-describedby="file_input_help"
+                    onChange={(e) => handleFileModuleChange(e, index)}
+                    type="file"
+                    name={`file_module_${index}`} // Pastikan name sesuai dengan format yang diharapkan
+                    required
+                  />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
                   PDF (MAX. 50MB).
                 </p>
               </div>
-              
               )}
-          
               {/* Tombol Hapus Module */}
               {modules.length > 1 && (
                 <button
@@ -482,7 +580,7 @@ const FormKelas = () => {
                   onClick={() => removeModule(index)}
                   className="text-red-500 mt-4"
                 >
-                  Hapus Module
+                  Hapus
                 </button>
               )}
             </div>
@@ -493,13 +591,146 @@ const FormKelas = () => {
               onClick={addModule}
               className="text-blue-500 hover:text-blue-700 mb-6"
             >
-              Tambah Module
+              Tambah
             </button>
           </div>
 
-          </>
-        )}
+        {/* ini unutk kuis */}
+        <div>
+            {/* Checkbox untuk menampilkan quiz */}
+            <div className="mb-4">
+              <label className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  checked={isQuizVisible}
+                  onChange={handleCheckboxChange}
+                  className="form-checkbox text-blue-500"
+                />
+                <span className="ml-2 text-gray-700">Tampilkan Quiz</span>
+              </label>
+            </div>
+            {isQuizVisible && (
+            <div>
+              <p className="text-xl text-gray-900 font-extralight dark:text-white">
+                Quiz
+              </p>
+              <p>Judul</p>
+                  {/* ini masuknya ke tabel modules dengan kolom header */}
+                  <input
+                    type="text"
+                    value={quizTitle}
+                    onChange={(e) => setQuizTitle(e.target.value)}
+                    placeholder="Masukkan Judul"
+                    className="border p-2 rounded-lg w-full mb-4"
+                    required
+                  />
+              {quiz.map((item, index) => (
+                <div key={index} className="mb-6 mt-4">
+                  {/* Input untuk Quiz */}
+                    <div className="mt-4">
+                  {/* ini masuk nya ke tabel quiz dengan kolom soal,foto_soal, a,b,c,d,true_answer */}
+                    <textarea
+                        value={item.question}
+                        onChange={(e) => handleQuizChange(index, "question", e.target.value)}
+                        placeholder="Masukkan Soal"
+                        className="border p-2 rounded-lg w-full mb-4"
+                        required
+                      />
+                      {/* Upload Foto */}
+                      {/* <p className="mt-1 text-sm text-gray-500 mb-1 dark:text-gray-300">Gambar Soal Jika Ada</p>
+                      <input
+                        type="file"
+                        onChange=""
+                        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                      />
+                      <p className="mt-1 text-sm text-gray-500 mb-4 dark:text-gray-300">
+                        SVG, PNG, JPG or GIF (MAX. 800x400px).
+                      </p> */}
+                      {/* Input untuk Pilihan Jawaban */}
+                      <div className="flex space-x-4">
+                        <label className="mt-2">A.</label>
+                        <input
+                          type="text"
+                          value={item.a}
+                          onChange={(e) => handleQuizChange(index, "a", e.target.value)}
+                          placeholder="Pilihan A"
+                          className="border p-2 rounded-lg w-full mb-2"
+                          required
+                        />                        
+                      </div>
+                      <div className="flex space-x-4">
+                        <label className="mt-2">B.</label>
+                        <input
+                          type="text"
+                          value={item.b}
+                          onChange={(e) => handleQuizChange(index, "b", e.target.value)}
+                          placeholder="Pilihan B"
+                          className="border p-2 rounded-lg w-full mb-2"
+                          required
+                        />
+                      </div>
+                      <div className="flex space-x-4">
+                        <label className="mt-2">C.</label>
+                        <input
+                          type="text"
+                          value={item.c}
+                          onChange={(e) => handleQuizChange(index, "c", e.target.value)}
+                          placeholder="Pilihan C"
+                          className="border p-2 rounded-lg w-full mb-2"
+                          required
+                        />                      
+                      </div>
+                      <div className="flex space-x-4">
+                        <label className="mt-2">D.</label>
+                        <input
+                          type="text"
+                          value={item.d}
+                          onChange={(e) => handleQuizChange(index, "d", e.target.value)}
+                          placeholder="Pilihan D"
+                          className="border p-2 rounded-lg w-full mb-2"
+                          required
+                        />
+                      </div>
 
+                      {/* Input untuk Jawaban Benar */}
+                      <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilih Jawaban Benar</label>
+                      <select 
+                        id="categories"
+                        name="category"
+                        value={item.answer}
+                        onChange={(e) => handleQuizChange(index, "answer", e.target.value)}
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      >       
+                        <option value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="c">C</option>
+                        <option value="d">D</option>
+                      </select>
+                    </div>
+                  {/* Tombol Hapus */}
+                  {quiz.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeQuiz(index)}
+                      className="text-red-500 mt-4"
+                    >
+                      Hapus Soal
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addQuiz}
+                className="text-blue-500 hover:text-blue-700 mb-6"
+              >
+                Tambah Soal
+              </button>
+            </div>
+            )}
+        </div>
+        </>
+        )}
         <div className="mb-6">
           <button
             type="submit"

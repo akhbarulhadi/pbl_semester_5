@@ -248,7 +248,7 @@ router.get("/:id_course", async (req, res) => {
 
     const { data: courseData, error: courseError } = await supabase
       .from("courses")
-      .select("*, modules(*, quiz(soal, foto_soal, a, b, c, d))") // Jangan lupa ambil quiz
+      .select("*, modules(*, quiz(id_quiz, soal, foto_soal, a, b, c, d))") // Jangan lupa ambil quiz
       .eq("id_course", id_course)
       .single();
 

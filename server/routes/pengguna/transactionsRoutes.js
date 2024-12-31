@@ -162,7 +162,6 @@ router.post("/midtrans-notification", async (req, res) => {
     const { order_id, transaction_status, payment_type } = req.body;
 
     try {
-        // Update status pembayaran berdasarkan notifikasi Midtrans
         let payment_status = 'pending';
         if (transaction_status === 'settlement' || transaction_status === 'capture') {
             payment_status = 'paid';
@@ -170,80 +169,159 @@ router.post("/midtrans-notification", async (req, res) => {
             payment_status = 'failed';
         }
 
-        // Update status pembayaran di database
-        const { data: paymentData, error: paymentError } = await supabase
+        // // Cek dan tandai transaksi sebagai diproses
+        // const { data: isProcessedRecord } = await supabase
+        //     .from("user_payment_courses")
+        //     .select("is_processed")
+        //     .eq("transaction_id", order_id)
+        //     .single();
+
+        // if (isProcessedRecord && isProcessedRecord.is_processed) {
+        //     return res.status(200).json({ message: "Transaksi sudah diproses sebelumnya" });
+        // }
+
+        await supabase
             .from("user_payment_courses")
             .update({ payment_status, payment_method: payment_type, payment_date: new Date() })
             .eq("transaction_id", order_id);
 
-        if (paymentError) throw paymentError;
-
-        // Jika pembayaran berhasil, tambahkan data ke tabel join_courses
         if (payment_status === 'paid') {
-            // Ambil detail kursus dan pengguna berdasarkan order_id
-            const { data: paymentRecord, error: paymentRecordError } = await supabase
+            const { data: paymentRecord } = await supabase
                 .from("user_payment_courses")
-                .select("id_user, id_course, price, id_user_teacher") // Get id_user_teacher as well
+                .select("id_user, id_course, price, id_user_teacher")
                 .eq("transaction_id", order_id)
-                .single();
-
-            if (paymentRecordError || !paymentRecord) throw new Error("Detail transaksi tidak ditemukan");
+                .limit(1)
+                .maybeSingle();
 
             const { id_user, id_course, price, id_user_teacher } = paymentRecord;
 
-            // Insert to join_courses
-            const { data: joinData, error: joinError } = await supabase
+            const { data: existingJoinCourse } = await supabase
                 .from("join_courses")
-                .insert([{ id_user: id_user, id_course: id_course }]);
+                .select("id")
+                .eq("id_user", id_user)
+                .eq("id_course", id_course)
+                .single();
 
-            if (joinError) throw joinError;
+            if (!existingJoinCourse) {
+                await supabase
+                    .from("join_courses")
+                    .insert([{ id_user: id_user, id_course: id_course }]);
+            }
 
-            // Update or insert into teacher_balance
-            // Check if the teacher's balance already exists
-            const { data: balanceRecord, error: balanceError } = await supabase
+            const { data: balanceRecord } = await supabase
                 .from("teacher_balance")
                 .select("id, balance")
                 .eq("id_user_teacher", id_user_teacher)
-                .single();
+                .limit(1)
+                .maybeSingle();
 
-            let newBalance = price; // Start with the price from the payment
-
-            if (balanceError) throw balanceError;
-
-            // If a balance record exists, update it
+            let newBalance = price;
             if (balanceRecord) {
-                newBalance += balanceRecord.balance; // Add to existing balance
-                const { error: updateBalanceError } = await supabase
+                newBalance += balanceRecord.balance;
+                await supabase
                     .from("teacher_balance")
                     .update({ balance: newBalance, updated_at: new Date() })
                     .eq("id", balanceRecord.id);
-                
-                if (updateBalanceError) throw updateBalanceError;
             } else {
-                // If no record exists, create a new one
-                const { error: insertBalanceError } = await supabase
+                await supabase
                     .from("teacher_balance")
-                    .insert([{
-                        id_user_teacher,
-                        created_at: new Date(),
-                        balance: newBalance,
-                        updated_at: new Date()
-                    }]);
-
-                if (insertBalanceError) throw insertBalanceError;
+                    .insert([{ id_user_teacher, balance: newBalance, created_at: new Date(), updated_at: new Date() }]);
             }
         }
 
-        res.status(200).json({ 
-            message: "Notifikasi diterima", 
-            data: paymentData,
-            status: payment_status,
-        });
+        res.status(200).json({ message: "Notifikasi diterima", status: payment_status });
     } catch (error) {
         console.error('Error dalam Midtrans Notification:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
+
+// router.post("/midtrans-notification", async (req, res) => {
+//     const { order_id, transaction_status, payment_type } = req.body;
+
+//     try {
+//         // Update status pembayaran berdasarkan notifikasi Midtrans
+//         let payment_status = 'pending';
+//         if (transaction_status === 'settlement' || transaction_status === 'capture') {
+//             payment_status = 'paid';
+//         } else if (transaction_status === 'cancel' || transaction_status === 'expire') {
+//             payment_status = 'failed';
+//         }
+
+//         // Update status pembayaran di database
+//         const { data: paymentData, error: paymentError } = await supabase
+//             .from("user_payment_courses")
+//             .update({ payment_status, payment_method: payment_type, payment_date: new Date() })
+//             .eq("transaction_id", order_id);
+
+//         if (paymentError) throw paymentError;
+
+//         // Jika pembayaran berhasil, tambahkan data ke tabel join_courses
+//         if (payment_status === 'paid') {
+//             // Ambil detail kursus dan pengguna berdasarkan order_id
+//             const { data: paymentRecord, error: paymentRecordError } = await supabase
+//                 .from("user_payment_courses")
+//                 .select("id_user, id_course, price, id_user_teacher") // Get id_user_teacher as well
+//                 .eq("transaction_id", order_id)
+//                 .single();
+
+//             if (paymentRecordError || !paymentRecord) throw new Error("Detail transaksi tidak ditemukan");
+
+//             const { id_user, id_course, price, id_user_teacher } = paymentRecord;
+
+//             // Insert to join_courses
+//             const { data: joinData, error: joinError } = await supabase
+//                 .from("join_courses")
+//                 .insert([{ id_user: id_user, id_course: id_course }]);
+
+//             if (joinError) throw joinError;
+
+//             // Update or insert into teacher_balance
+//             // Check if the teacher's balance already exists
+//             const { data: balanceRecord, error: balanceError } = await supabase
+//                 .from("teacher_balance")
+//                 .select("id, balance")
+//                 .eq("id_user_teacher", id_user_teacher)
+//                 .single();
+
+//             let newBalance = price; // Start with the price from the payment
+
+//             if (balanceError) throw balanceError;
+
+//             // If a balance record exists, update it
+//             if (balanceRecord) {
+//                 newBalance += balanceRecord.balance; // Add to existing balance
+//                 const { error: updateBalanceError } = await supabase
+//                     .from("teacher_balance")
+//                     .update({ balance: newBalance, updated_at: new Date() })
+//                     .eq("id", balanceRecord.id);
+                
+//                 if (updateBalanceError) throw updateBalanceError;
+//             } else {
+//                 // If no record exists, create a new one
+//                 const { error: insertBalanceError } = await supabase
+//                     .from("teacher_balance")
+//                     .insert([{
+//                         id_user_teacher,
+//                         created_at: new Date(),
+//                         balance: newBalance,
+//                         updated_at: new Date()
+//                     }]);
+
+//                 if (insertBalanceError) throw insertBalanceError;
+//             }
+//         }
+
+//         res.status(200).json({ 
+//             message: "Notifikasi diterima", 
+//             data: paymentData,
+//             status: payment_status,
+//         });
+//     } catch (error) {
+//         console.error('Error dalam Midtrans Notification:', error.message);
+//         res.status(500).json({ error: error.message });
+//     }
+// });
 
 
 // ! ini unutk testing notifikasi midtrans sebelumnya

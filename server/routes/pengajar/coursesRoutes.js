@@ -750,7 +750,7 @@ router.post('/', uploadAny, async (req, res) => {
   console.log('Files received:', req.files);
   // console.log('Received module files:', req.files.filter(file => file.fieldname.startsWith('file_module_')));
 
-  const { courseTitle, courseDescription, price, paid, trailerVideoYoutube, statusCourse, online, locationOffline, preOrderOfflineDate, category, benefit, modules } = req.body;
+  const { courseTitle, courseDescription, price, paid, trailerVideoYoutube, statusCourse, online, locationOffline, preOrderOfflineDate, category, benefit, modules, quiz } = req.body;
   const idUser = req.user.id;
 
   if (!courseTitle || !courseDescription || !idUser) {
@@ -817,7 +817,7 @@ router.post('/', uploadAny, async (req, res) => {
   
     if (modulesData.length > 0) {
       const modulesToInsert = modulesData.map((module, index) => {
-        const moduleFile = module.inputType === "file"
+        const moduleFile = (module.inputType === "file" || module.inputType === "essay")
           ? moduleFiles.find(file => file.fieldname === `file_module_${index}`)
           : null;
   
@@ -826,7 +826,9 @@ router.post('/', uploadAny, async (req, res) => {
           link_video_youtube: module.inputType === "youtube" ? module.linkVideoYoutube : null,
           header: module.header,
           file_module: moduleFile ? `/uploads/module/${moduleFile.filename}` : null,
-          type_link: module.inputType === "youtube" ? "youtube" : module.inputType === "file" ? "pdf" : null,
+          type_link: module.inputType === "youtube" ? "youtube" : module.inputType === "file" ? "pdf" : module.inputType === "essay" ? "pdf" : null,
+          type_module: module.inputType === "essay" ? "essay" : "modul",
+          can_user_upload: module.inputType === "essay" ? true : false,
         };
       });
   
@@ -834,6 +836,46 @@ router.post('/', uploadAny, async (req, res) => {
       if (moduleError) throw new Error(moduleError.message);
     }
   }
+
+    // Insert quiz ke modules dan tabel quiz
+    if (quiz) {
+      let quizData = [];
+      try {
+        quizData = JSON.parse(quiz);
+      } catch (error) {
+        return res.status(400).json({ error: 'Invalid JSON format for quiz' });
+      }
+  
+      const validQuizData = quizData.filter(quizItem => quizItem.question && quizItem.a && quizItem.b && quizItem.c && quizItem.d);
+  
+      if (validQuizData.length > 0) {
+        const { data: moduleData, error: moduleError } = await supabase.from('modules').insert({
+          id_courses: courseId,
+          header: req.body.quizTitle,
+          type_link: 'kuis',
+          type_module: 'kuis',
+          can_user_upload: false,
+        }).select('id_modules');
+  
+        if (moduleError) throw new Error(moduleError.message);
+  
+        const moduleId = moduleData[0].id_modules;
+  
+        for (const quizItem of validQuizData) {
+          const { error: quizError } = await supabase.from('quiz').insert({
+            id_modules: moduleId,
+            soal: quizItem.question,
+            a: quizItem.a,
+            b: quizItem.b,
+            c: quizItem.c,
+            d: quizItem.d,
+            true_answer: quizItem.answer,
+          });
+  
+          if (quizError) throw new Error(quizError.message);
+        }
+      }
+    }
   
 
   res.status(200).json({ message: 'Course, benefits, and modules added successfully' });

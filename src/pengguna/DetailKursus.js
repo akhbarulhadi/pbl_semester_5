@@ -37,12 +37,13 @@ const SidebarDetailKursus = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log("Selected Answers:", selectedAnswers); // Tambahkan log ini
 
     const moduleId = activeContent.moduleId;
 
     // Siapkan data quiz
     const quizzes = activeContent.soal.map((soal, index) => ({
-      id_quiz: index + 1,
+      id_quiz: activeContent.id_quiz[index],
       answers: selectedAnswers[index],
     }));
 
@@ -267,7 +268,8 @@ const calculateDaysLeft = (startDateString, endDateString) => {
       const baseURL = 'http://localhost:5000/api'; // Ganti dengan base URL backend Anda
       content = { 
         url: module.quiz.map(q => `${baseURL}${q.foto_soal}`), 
-        foto_soal: module.quiz.map(q => q.foto_soal), 
+        foto_soal: module.quiz.map(q => q.foto_soal),
+        id_quiz: module.quiz.map(q => q.id_quiz), 
         correct_answers: correctAnswers,
         wrong_answers: wrongAnswers,
         total_questions: totalQuestions,
@@ -633,6 +635,7 @@ const calculateDaysLeft = (startDateString, endDateString) => {
                       {activeContent.soal.map((soal, index) => (
                         <div key={index} className="mb-4">
                               <p className="font-bold">{soal}</p>
+                              <p className="font-bold">{activeContent.id_quiz[index]}</p>
                           {/* Cek apakah ada URL gambar */}
                           {activeContent.foto_soal[index] && (
                             <img

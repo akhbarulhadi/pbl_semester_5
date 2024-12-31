@@ -151,14 +151,15 @@ router.post("/:id_course", async (req, res) => {
 router.post('/quiz/submit-quiz', async (req, res) => {
   const { moduleId, quizzes } = req.body;
 
+  // Validasi input
   if (!moduleId || !Array.isArray(quizzes) || quizzes.length === 0) {
-    return res.status(400).json({ error: 'Invalid input format or missing quizzes data' });
+    return res.status(400).json({ error: 'Format input tidak valid atau data kuis tidak ada' });
   }
 
   const moduleIdInt = parseInt(moduleId, 10);
 
   if (isNaN(moduleIdInt)) {
-    return res.status(400).json({ error: 'Invalid moduleId format' });
+    return res.status(400).json({ error: 'Format moduleId tidak valid' });
   }
 
   try {
@@ -168,26 +169,38 @@ router.post('/quiz/submit-quiz', async (req, res) => {
 
     for (const quiz of quizzes) {
       const { id_quiz, answers } = quiz;
-
+      console.log("Module ID:", moduleIdInt);
+      console.log("Quiz ID:", id_quiz);
+      console.log("Jawaban dari frontend:", answers);
+      
       if (!id_quiz || !answers) {
-        results.push({ id_quiz, error: 'Missing required fields for quiz' });
+        results.push({ id_quiz, error: 'Field yang dibutuhkan untuk kuis tidak ada' });
         continue;
       }
+
+      // Menampilkan log query yang dikirimkan
+      console.log("Mencari data kuis untuk:", { id_quiz, moduleIdInt });
 
       const { data: quizData, error: fetchError } = await supabase
         .from('quiz')
         .select('*')
         .eq('id_quiz', id_quiz)
-        .eq('id_modules', moduleIdInt)
-        .single();
+        .eq('id_modules', moduleIdInt); // Mengambil data kuis berdasarkan id_quiz dan moduleId
 
-      if (fetchError || !quizData) {
-        results.push({ id_quiz, error: 'Error fetching quiz data or quiz not found' });
+      console.log("Data kuis yang diambil:", quizData);  // Log hasil dari query
+
+      if (fetchError || !quizData || quizData.length === 0) {
+        console.log("Tidak ada data kuis ditemukan untuk id_quiz:", id_quiz, "moduleId:", moduleIdInt);
+        results.push({ id_quiz, error: 'Error mengambil data kuis atau kuis tidak ditemukan' });
         continue;
       }
 
-      const correctAnswer = quizData.true_answer;
-      const isCorrect = answers === correctAnswer;
+      const correctAnswer = quizData[0].true_answer; // Jika ada lebih dari satu baris, ambil yang pertama
+      console.log("Jawaban benar dari database:", correctAnswer); // Log jawaban benar dari database
+
+      // Pastikan jawaban dibandingkan dengan tipe yang sama (string)
+      const isCorrect = String(answers) === String(correctAnswer);
+      console.log("Apakah jawabannya benar?", isCorrect); // Log hasil perbandingan
 
       if (isCorrect) {
         correctAnswerCount++;
@@ -204,7 +217,7 @@ router.post('/quiz/submit-quiz', async (req, res) => {
 
     const totalAnswers = correctAnswerCount + wrongAnswerCount;
 
-    // Update the `users_opened_modules` table
+    // Update tabel `user_opened_modules` setelah kuis selesai
     const { error: updateError } = await supabase
       .from('user_opened_modules')
       .update({
@@ -216,11 +229,11 @@ router.post('/quiz/submit-quiz', async (req, res) => {
       .eq('id_modules', moduleIdInt);
 
     if (updateError) {
-      console.error('Error updating users_opened_modules:', updateError);
-      return res.status(500).json({ error: 'Failed to update users_opened_modules' });
+      console.error('Error saat update tabel users_opened_modules:', updateError);
+      return res.status(500).json({ error: 'Gagal mengupdate tabel users_opened_modules' });
     }
 
-    // Return the response with the results and summary
+    // Mengirimkan respons dengan hasil dan ringkasan
     return res.json({
       id_modules: moduleIdInt,
       correct_answers: correctAnswerCount,
@@ -230,9 +243,10 @@ router.post('/quiz/submit-quiz', async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'An error occurred while submitting the quiz' });
+    return res.status(500).json({ error: 'Terjadi kesalahan saat mengirimkan kuis' });
   }
 });
+
 
 // ! Konfigurasi Multer untuk penyimpanan file
 const storage = multer.diskStorage({
